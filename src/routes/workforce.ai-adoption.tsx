@@ -70,7 +70,7 @@ function AIAdoptionPage() {
         <div className="text-[11px] tracking-[0.18em] text-slate-500 mb-1">
           WORKSPACE · {companyLabel.toUpperCase()}
         </div>
-        <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+        <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
           AI Adoption & Skills
         </h1>
       </div>
@@ -83,7 +83,7 @@ function AIAdoptionPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-[12px]">
             <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <th className="text-left py-2 pr-3">Company</th>
                 {TOOLS.map((t) => (
                   <th key={t} className="text-center py-2 px-2">{t}</th>
@@ -92,8 +92,8 @@ function AIAdoptionPage() {
             </thead>
             <tbody>
               {COMPANIES.map((c) => (
-                <tr key={c} className="border-b border-white/5 last:border-0">
-                  <td className="py-2.5 pr-3 text-white text-[13px]">{c}</td>
+                <tr key={c} className="border-b border-slate-200 last:border-0">
+                  <td className="py-2.5 pr-3 text-slate-900 text-[13px]">{c}</td>
                   {MATRIX[c].map(([adopt, users, trend], i) => {
                     const tone = cellTone(adopt);
                     return (
@@ -131,7 +131,7 @@ function AIAdoptionPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+                <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                   <th className="text-left py-2 pr-3">Skill</th>
                   {LEVELS.map((l) => (
                     <th key={l} className="text-center py-2 px-2">{l}</th>
@@ -140,7 +140,7 @@ function AIAdoptionPage() {
               </thead>
               <tbody>
                 {SKILLS.map((s, i) => (
-                  <tr key={s} className="border-b border-white/5 last:border-0">
+                  <tr key={s} className="border-b border-slate-200 last:border-0">
                     <td className="py-2 pr-3 text-slate-200">{s}</td>
                     {HEATMAP[i].map((v, j) => {
                       const palette = [COLORS.red, COLORS.amber, COLORS.teal, COLORS.green];
@@ -172,23 +172,23 @@ function AIAdoptionPage() {
         <GlassPanel title="Skill Gap Analysis" description="Current vs target proficient workforce share">
           <div className="space-y-3">
             {GAPS.map((g) => (
-              <div key={g.skill} className="rounded-xl border border-white/5 p-3" style={{ backgroundColor: "rgba(255,255,255,0.02)" }}>
+              <div key={g.skill} className="rounded-xl border border-slate-200 p-3" style={{ backgroundColor: "#f8fafc" }}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[13px] text-white">{g.skill}</span>
+                  <span className="text-[13px] text-slate-900">{g.skill}</span>
                   <Pill
                     label={g.priority}
                     tone={g.priority === "Critical" ? "red" : g.priority === "High" ? "amber" : "indigo"}
                   />
                 </div>
-                <div className="relative h-2 rounded-full bg-white/5 overflow-hidden">
+                <div className="relative h-2 rounded-full bg-slate-100 overflow-hidden">
                   <div className="absolute h-full" style={{ width: `${g.current}%`, backgroundColor: COLORS.teal }} />
                   <div
                     className="absolute h-full border-l-2"
                     style={{ left: `${g.target}%`, borderColor: COLORS.indigo, height: "100%" }}
                   />
                 </div>
-                <div className="flex justify-between text-[11px] text-slate-400 mt-1.5">
-                  <span>Current <span className="text-white">{g.current}%</span></span>
+                <div className="flex justify-between text-[11px] text-slate-600 mt-1.5">
+                  <span>Current <span className="text-slate-900">{g.current}%</span></span>
                   <span>Target <span style={{ color: COLORS.indigo }}>{g.target}%</span></span>
                   <span>Gap <span style={{ color: COLORS.red }}>{g.gap} pts</span></span>
                 </div>

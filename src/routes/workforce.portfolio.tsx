@@ -128,7 +128,7 @@ function PortfolioOverview() {
           WORKSPACE · {companyLabel.toUpperCase()}
         </div>
         <h1
-          className="text-2xl font-semibold text-white"
+          className="text-2xl font-semibold text-slate-900"
           style={{ fontFamily: "Outfit, sans-serif" }}
         >
           Portfolio Overview
@@ -143,12 +143,12 @@ function PortfolioOverview() {
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <th className="text-left py-2 pr-3">#</th>
                 {COLUMNS.map((c) => (
                   <th
                     key={c.key}
-                    className={`py-2 pr-3 select-none cursor-pointer hover:text-white ${
+                    className={`py-2 pr-3 select-none cursor-pointer hover:text-slate-900 ${
                       c.key === "company" ? "text-left" : "text-right"
                     }`}
                     onClick={() => toggleSort(c.key)}
@@ -168,13 +168,13 @@ function PortfolioOverview() {
               {sorted.map((r, i) => (
                 <tr
                   key={r.company}
-                  className="border-b border-white/5 hover:bg-white/[0.02]"
+                  className="border-b border-slate-200 hover:bg-slate-50"
                 >
                   <td className="py-2.5 pr-3">
                     <span
                       className="inline-flex items-center justify-center w-5 h-5 rounded-md text-[10px] font-semibold"
                       style={{
-                        backgroundColor: i === 0 ? `${COLORS.amber}22` : "rgba(255,255,255,0.05)",
+                        backgroundColor: i === 0 ? `${COLORS.amber}22` : "#e2e8f0",
                         color: i === 0 ? COLORS.amber : "#94a3b8",
                       }}
                     >
@@ -187,7 +187,7 @@ function PortfolioOverview() {
                     return (
                       <td
                         key={c.key}
-                        className={`py-2.5 pr-3 ${isCompany ? "text-left text-white" : "text-right text-slate-200"}`}
+                        className={`py-2.5 pr-3 ${isCompany ? "text-left text-slate-900" : "text-right text-slate-200"}`}
                       >
                         {c.fmt ? c.fmt(v as number) : v}
                       </td>
@@ -196,10 +196,10 @@ function PortfolioOverview() {
                 </tr>
               ))}
               <tr style={{ backgroundColor: "rgba(99,102,241,0.06)" }}>
-                <td className="py-2.5 pr-3 text-[10px] uppercase tracking-wider text-slate-400">
+                <td className="py-2.5 pr-3 text-[10px] uppercase tracking-wider text-slate-600">
                   Avg
                 </td>
-                <td className="py-2.5 pr-3 text-left text-slate-300">Portfolio Average</td>
+                <td className="py-2.5 pr-3 text-left text-slate-700">Portfolio Average</td>
                 <td className="py-2.5 pr-3 text-right text-slate-200">
                   {averages.employees.toLocaleString()}
                 </td>
@@ -226,10 +226,10 @@ function PortfolioOverview() {
           {BENCH.map((b) => (
             <div
               key={b.cat}
-              className="rounded-xl border border-white/5 p-4"
-              style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+              className="rounded-xl border border-slate-200 p-4"
+              style={{ backgroundColor: "#f8fafc" }}
             >
-              <div className="text-[12px] text-slate-300 font-medium">{b.cat}</div>
+              <div className="text-[12px] text-slate-700 font-medium">{b.cat}</div>
               <div className="mt-3 space-y-2">
                 <Bench label="Top Quartile" value={b.top} color={COLORS.green} max={b.top} />
                 <Bench label="Median" value={b.median} color={COLORS.teal} max={b.top} />
@@ -245,12 +245,12 @@ function PortfolioOverview() {
           <div className="h-64">
             <ResponsiveContainer>
               <BarChart data={rankingData} layout="vertical" margin={{ left: 0, right: 16 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                <CartesianGrid stroke="#e2e8f0" horizontal={false} />
                 <XAxis type="number" stroke="#64748b" fontSize={11} />
                 <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={11} width={60} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0d1222",
+                    backgroundColor: "#ffffff",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                     fontSize: 12,
@@ -272,7 +272,7 @@ function PortfolioOverview() {
               <PieChart>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0d1222",
+                    backgroundColor: "#ffffff",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                     fontSize: 12,
@@ -303,12 +303,12 @@ function PortfolioOverview() {
           <div className="h-64">
             <ResponsiveContainer>
               <BarChart data={valueData} margin={{ left: -10, right: 8 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <CartesianGrid stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0d1222",
+                    backgroundColor: "#ffffff",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                     fontSize: 12,
@@ -341,12 +341,12 @@ function Bench({
   return (
     <div>
       <div className="flex justify-between text-[11px] mb-1">
-        <span className="text-slate-400">{label}</span>
+        <span className="text-slate-600">{label}</span>
         <span style={{ color }} className="font-medium">
           {value}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
     </div>

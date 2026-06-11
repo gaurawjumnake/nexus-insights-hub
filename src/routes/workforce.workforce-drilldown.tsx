@@ -106,7 +106,7 @@ function DrillDownPage() {
         <div className="text-[11px] tracking-[0.18em] text-slate-500 mb-1">
           WORKSPACE · {companyLabel.toUpperCase()}
         </div>
-        <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+        <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
           Workforce Drill Down
         </h1>
       </div>
@@ -115,13 +115,13 @@ function DrillDownPage() {
         title="Hierarchy"
         description="Click a row to drill in. Use breadcrumbs to navigate back."
         action={
-          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-white/10 bg-white/[0.03]">
+          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-slate-200 bg-slate-50">
             <Search className="w-3.5 h-3.5 text-slate-500" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Filter children…"
-              className="bg-transparent text-[12px] text-white placeholder:text-slate-500 outline-none w-40"
+              className="bg-transparent text-[12px] text-slate-900 placeholder:text-slate-400 outline-none w-40"
             />
           </div>
         }
@@ -135,7 +135,7 @@ function DrillDownPage() {
                 <button
                   onClick={() => setCurrentId(n.id)}
                   className={`inline-flex items-center gap-1 px-2 py-1 rounded-md ${
-                    isLast ? "text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
+                    isLast ? "text-slate-900" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
                   style={isLast ? { backgroundColor: "rgba(99,102,241,0.15)" } : undefined}
                 >
@@ -160,7 +160,7 @@ function DrillDownPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+                <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                   <th className="text-left py-2 pr-3">Name</th>
                   <th className="text-left py-2 pr-3">Level</th>
                   <th className="text-right py-2 pr-3">Headcount</th>
@@ -176,9 +176,9 @@ function DrillDownPage() {
                   <tr
                     key={c.id}
                     onClick={() => setCurrentId(c.id)}
-                    className="border-b border-white/5 last:border-0 hover:bg-white/[0.03] cursor-pointer"
+                    className="border-b border-slate-200 last:border-0 hover:bg-slate-50 cursor-pointer"
                   >
-                    <td className="py-2.5 pr-3 text-white">
+                    <td className="py-2.5 pr-3 text-slate-900">
                       <span className="inline-flex items-center gap-1.5">
                         {c.name}
                         {c.children && c.children.length > 0 && (
@@ -201,7 +201,7 @@ function DrillDownPage() {
             </table>
           </div>
         ) : (
-          <div className="rounded-xl border border-white/5 p-6 text-center text-slate-400 text-[13px]" style={{ backgroundColor: "rgba(255,255,255,0.02)" }}>
+          <div className="rounded-xl border border-slate-200 p-6 text-center text-slate-600 text-[13px]" style={{ backgroundColor: "#f8fafc" }}>
             Leaf node — no further breakdown available.
           </div>
         )}
@@ -212,7 +212,7 @@ function DrillDownPage() {
 
 function Stat({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
   return (
-    <div className="rounded-xl border border-white/5 p-3" style={{ backgroundColor: "rgba(255,255,255,0.02)" }}>
+    <div className="rounded-xl border border-slate-200 p-3" style={{ backgroundColor: "#f8fafc" }}>
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500">
         <span style={{ color }}>{icon}</span>
         {label}

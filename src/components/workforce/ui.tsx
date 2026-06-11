@@ -1,13 +1,15 @@
 import type { ReactNode } from "react";
 
 export const COLORS = {
-  bg: "#060913",
-  panel: "#0d1222",
+  bg: "#f8fafc",
+  panel: "#ffffff",
   indigo: "#6366f1",
   green: "#10b981",
   teal: "#14b8a6",
   amber: "#f59e0b",
   red: "#ef4444",
+  blue: "#3b82f6",
+  violet: "#8b5cf6",
 };
 
 export function GlassPanel({
@@ -25,25 +27,21 @@ export function GlassPanel({
 }) {
   return (
     <section
-      className={`rounded-2xl border border-white/5 backdrop-blur-sm ${className}`}
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(99,102,241,0.04) 0%, rgba(20,184,166,0.02) 100%), rgba(13,18,34,0.85)",
-      }}
+      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`}
     >
       {(title || action) && (
         <header className="flex items-start justify-between px-5 pt-5 pb-3">
           <div>
             {title && (
               <h3
-                className="text-[15px] font-semibold text-white"
+                className="text-[15px] font-semibold text-slate-900"
                 style={{ fontFamily: "Outfit, sans-serif" }}
               >
                 {title}
               </h3>
             )}
             {description && (
-              <p className="mt-0.5 text-[12px] text-slate-400">{description}</p>
+              <p className="mt-0.5 text-[12px] text-slate-500">{description}</p>
             )}
           </div>
           {action}
@@ -61,7 +59,7 @@ export function KpiCard({
   trendDirection = "up",
   icon,
   footer,
-  accent = COLORS.indigo,
+  accent = COLORS.teal,
 }: {
   title: string;
   value: string;
@@ -76,17 +74,11 @@ export function KpiCard({
       ? COLORS.green
       : trendDirection === "down"
         ? COLORS.red
-        : "#94a3b8";
+        : "#64748b";
   return (
-    <div
-      className="relative rounded-2xl border border-white/5 p-5 overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%), #0d1222",
-      }}
-    >
+    <div className="relative rounded-2xl border border-slate-200 bg-white p-5 overflow-hidden shadow-sm">
       <div
-        className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 blur-2xl"
+        className="absolute top-0 left-0 right-0 h-0.5"
         style={{ backgroundColor: accent }}
       />
       <div className="flex items-start justify-between relative">
@@ -95,7 +87,7 @@ export function KpiCard({
             {title}
           </div>
           <div
-            className="mt-2 text-2xl font-semibold text-white"
+            className="mt-2 text-2xl font-semibold text-slate-900"
             style={{ fontFamily: "Outfit, sans-serif" }}
           >
             {value}
@@ -111,7 +103,7 @@ export function KpiCard({
         </div>
         <div
           className="w-9 h-9 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `${accent}1f`, color: accent }}
+          style={{ backgroundColor: `${accent}1a`, color: accent }}
         >
           {icon}
         </div>
@@ -126,20 +118,22 @@ export function Pill({
   tone = "indigo",
 }: {
   label: string;
-  tone?: "indigo" | "green" | "teal" | "amber" | "red" | "slate";
+  tone?: "indigo" | "green" | "teal" | "amber" | "red" | "slate" | "blue" | "violet";
 }) {
-  const c = {
-    indigo: COLORS.indigo,
-    green: COLORS.green,
-    teal: COLORS.teal,
-    amber: COLORS.amber,
-    red: COLORS.red,
-    slate: "#94a3b8",
+  const map = {
+    indigo: { fg: "#4338ca", bg: "#eef2ff" },
+    green: { fg: "#047857", bg: "#ecfdf5" },
+    teal: { fg: "#0f766e", bg: "#f0fdfa" },
+    amber: { fg: "#b45309", bg: "#fffbeb" },
+    red: { fg: "#b91c1c", bg: "#fef2f2" },
+    slate: { fg: "#475569", bg: "#f1f5f9" },
+    blue: { fg: "#1d4ed8", bg: "#eff6ff" },
+    violet: { fg: "#6d28d9", bg: "#f5f3ff" },
   }[tone];
   return (
     <span
       className="inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider"
-      style={{ color: c, backgroundColor: `${c}1a`, border: `1px solid ${c}33` }}
+      style={{ color: map.fg, backgroundColor: map.bg }}
     >
       {label}
     </span>

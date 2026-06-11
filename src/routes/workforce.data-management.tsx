@@ -126,14 +126,14 @@ function DataManagement() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
             Workforce Data Management
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 mt-1">
             Central ingestion hub for {companyLabel} · workforce & AI datasets
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[11px] text-slate-400">
+        <div className="flex items-center gap-2 text-[11px] text-slate-600">
           <Database className="w-4 h-4" style={{ color: COLORS.teal }} />
           <span>Last sync · 2 min ago</span>
         </div>
@@ -166,8 +166,8 @@ function DataManagement() {
             }}
             className="rounded-xl border-2 border-dashed flex flex-col items-center justify-center py-10 transition-colors"
             style={{
-              borderColor: dragOver ? COLORS.indigo : "rgba(255,255,255,0.08)",
-              background: dragOver ? "rgba(99,102,241,0.06)" : "rgba(255,255,255,0.015)",
+              borderColor: dragOver ? COLORS.indigo : "#cbd5e1",
+              background: dragOver ? "rgba(99,102,241,0.06)" : "#f8fafc",
             }}
           >
             <div
@@ -176,16 +176,16 @@ function DataManagement() {
             >
               <Upload className="w-6 h-6" />
             </div>
-            <div className="text-sm font-medium text-white">Drop files here or click to browse</div>
+            <div className="text-sm font-medium text-slate-900">Drop files here or click to browse</div>
             <div className="text-[11px] text-slate-500 mt-1">Up to 500MB · CSV · XLSX · JSON</div>
             <div className="flex items-center gap-3 mt-4">
               <button
-                className="text-xs px-4 py-2 rounded-md font-medium text-white"
+                className="text-xs px-4 py-2 rounded-md font-medium text-slate-900"
                 style={{ background: `linear-gradient(135deg, ${COLORS.indigo}, ${COLORS.teal})` }}
               >
                 Browse Files
               </button>
-              <button className="text-xs px-4 py-2 rounded-md font-medium text-slate-300 border border-white/10">
+              <button className="text-xs px-4 py-2 rounded-md font-medium text-slate-700 border border-slate-200">
                 Connect API Source
               </button>
             </div>
@@ -199,11 +199,11 @@ function DataManagement() {
             ].map((f) => (
               <div
                 key={f.label}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/5"
-                style={{ background: "rgba(255,255,255,0.02)" }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200"
+                style={{ background: "#f8fafc" }}
               >
                 <f.icon className="w-4 h-4" style={{ color: f.color }} />
-                <span className="text-xs text-slate-300">{f.label} supported</span>
+                <span className="text-xs text-slate-700">{f.label} supported</span>
               </div>
             ))}
           </div>
@@ -217,12 +217,12 @@ function DataManagement() {
               return (
                 <div key={v.check}>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-slate-300">{v.check}</span>
+                    <span className="text-xs text-slate-700">{v.check}</span>
                     <span className="text-[11px] text-slate-500">
                       {v.passed}/{total}
                     </span>
                   </div>
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#e2e8f0" }}>
                     <div
                       className="h-full rounded-full"
                       style={{
@@ -250,11 +250,11 @@ function DataManagement() {
               <div
                 key={i}
                 className="flex items-center gap-3 px-3 py-2 rounded-lg"
-                style={{ background: "rgba(255,255,255,0.02)" }}
+                style={{ background: "#f8fafc" }}
               >
                 <span className="text-[11px] text-slate-500 font-mono w-16">{l.ts}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-white truncate">{l.file}</div>
+                  <div className="text-xs text-slate-900 truncate">{l.file}</div>
                   <div className="text-[10px] text-slate-500">{l.msg}</div>
                 </div>
                 {statusPill(l.status)}
@@ -268,18 +268,18 @@ function DataManagement() {
             {TEMPLATES.map((t) => (
               <div
                 key={t.name}
-                className="flex items-center justify-between px-3 py-2 rounded-lg border border-white/5"
-                style={{ background: "rgba(255,255,255,0.02)" }}
+                className="flex items-center justify-between px-3 py-2 rounded-lg border border-slate-200"
+                style={{ background: "#f8fafc" }}
               >
                 <div className="min-w-0">
-                  <div className="text-xs font-medium text-white truncate">{t.name}</div>
+                  <div className="text-xs font-medium text-slate-900 truncate">{t.name}</div>
                   <div className="text-[10px] text-slate-500 truncate">{t.desc}</div>
                 </div>
                 <button
-                  className="shrink-0 ml-2 p-1.5 rounded-md border border-white/10 hover:bg-white/5"
+                  className="shrink-0 ml-2 p-1.5 rounded-md border border-slate-200 hover:bg-slate-50"
                   title={`Download ${t.name} template (${t.cols} columns)`}
                 >
-                  <Download className="w-3.5 h-3.5 text-slate-400" />
+                  <Download className="w-3.5 h-3.5 text-slate-600" />
                 </button>
               </div>
             ))}
@@ -302,13 +302,13 @@ function DataManagement() {
             </thead>
             <tbody>
               {HISTORY.map((h, i) => (
-                <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02]">
-                  <td className="px-3 py-2.5 text-white">{h.file}</td>
-                  <td className="px-3 py-2.5 text-slate-400">{h.source}</td>
-                  <td className="px-3 py-2.5 text-slate-400">{h.date}</td>
+                <tr key={i} className="border-t border-slate-200 hover:bg-slate-50">
+                  <td className="px-3 py-2.5 text-slate-900">{h.file}</td>
+                  <td className="px-3 py-2.5 text-slate-600">{h.source}</td>
+                  <td className="px-3 py-2.5 text-slate-600">{h.date}</td>
                   <td className="px-3 py-2.5">{statusPill(h.status)}</td>
-                  <td className="px-3 py-2.5 text-slate-300 tabular-nums">{h.records.toLocaleString()}</td>
-                  <td className="px-3 py-2.5 text-slate-400">{h.owner}</td>
+                  <td className="px-3 py-2.5 text-slate-700 tabular-nums">{h.records.toLocaleString()}</td>
+                  <td className="px-3 py-2.5 text-slate-600">{h.owner}</td>
                 </tr>
               ))}
             </tbody>
@@ -331,7 +331,7 @@ function DataManagement() {
                   setPage(1);
                 }}
                 placeholder="Search records…"
-                className="text-xs pl-8 pr-3 py-1.5 rounded-md border border-white/10 bg-white/[0.02] text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-400 w-56"
+                className="text-xs pl-8 pr-3 py-1.5 rounded-md border border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-500 w-56"
               />
             </div>
           </div>
@@ -350,15 +350,15 @@ function DataManagement() {
             </thead>
             <tbody>
               {pageRows.map((r) => (
-                <tr key={r.id} className="border-t border-white/5 hover:bg-white/[0.02]">
-                  <td className="px-3 py-2.5 text-white font-mono">{r.id}</td>
-                  <td className="px-3 py-2.5 text-slate-300">{r.company}</td>
-                  <td className="px-3 py-2.5 text-slate-400">{r.dept}</td>
-                  <td className="px-3 py-2.5 text-slate-400">{r.role}</td>
-                  <td className="px-3 py-2.5 text-slate-300">{r.tool}</td>
+                <tr key={r.id} className="border-t border-slate-200 hover:bg-slate-50">
+                  <td className="px-3 py-2.5 text-slate-900 font-mono">{r.id}</td>
+                  <td className="px-3 py-2.5 text-slate-700">{r.company}</td>
+                  <td className="px-3 py-2.5 text-slate-600">{r.dept}</td>
+                  <td className="px-3 py-2.5 text-slate-600">{r.role}</td>
+                  <td className="px-3 py-2.5 text-slate-700">{r.tool}</td>
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
-                      <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                      <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: "#e2e8f0" }}>
                         <div
                           className="h-full"
                           style={{
@@ -367,7 +367,7 @@ function DataManagement() {
                           }}
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400 tabular-nums">{r.adoption}%</span>
+                      <span className="text-[10px] text-slate-600 tabular-nums">{r.adoption}%</span>
                     </div>
                   </td>
                   <td className="px-3 py-2.5">
@@ -398,17 +398,17 @@ function DataManagement() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1 rounded border border-white/10 disabled:opacity-30 hover:bg-white/5"
+              className="p-1 rounded border border-slate-200 disabled:opacity-30 hover:bg-slate-50"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <span className="text-slate-400">
+            <span className="text-slate-600">
               Page {page} of {pages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(pages, p + 1))}
               disabled={page === pages}
-              className="p-1 rounded border border-white/10 disabled:opacity-30 hover:bg-white/5"
+              className="p-1 rounded border border-slate-200 disabled:opacity-30 hover:bg-slate-50"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>

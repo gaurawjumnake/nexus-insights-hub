@@ -157,7 +157,7 @@ function BoardroomDashboard() {
           WORKSPACE · {companyLabel.toUpperCase()}
         </div>
         <h1
-          className="text-2xl font-semibold text-white"
+          className="text-2xl font-semibold text-slate-900"
           style={{ fontFamily: "Outfit, sans-serif" }}
         >
           Boardroom Dashboard
@@ -180,8 +180,8 @@ function BoardroomDashboard() {
             return (
               <div
                 key={item.q}
-                className="rounded-xl border border-white/5"
-                style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                className="rounded-xl border border-slate-200"
+                style={{ backgroundColor: "#f8fafc" }}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : idx)}
@@ -197,16 +197,16 @@ function BoardroomDashboard() {
                     >
                       Q{idx + 1}
                     </div>
-                    <span className="text-[13px] text-white">{item.q}</span>
+                    <span className="text-[13px] text-slate-900">{item.q}</span>
                   </div>
                   <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform ${
+                    className={`w-4 h-4 text-slate-600 transition-transform ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-4 pb-4 pt-1 border-t border-white/5 grid md:grid-cols-3 gap-4">
+                  <div className="px-4 pb-4 pt-1 border-t border-slate-200 grid md:grid-cols-3 gap-4">
                     <div>
                       <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
                         Answer
@@ -248,7 +248,7 @@ function BoardroomDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+                <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                   <th className="text-left py-2 pr-3">Priority</th>
                   <th className="text-left py-2 pr-3">Company</th>
                   <th className="text-left py-2 pr-3">Impact</th>
@@ -260,7 +260,7 @@ function BoardroomDashboard() {
                 {RECOMMENDATIONS.map((r, i) => (
                   <tr
                     key={i}
-                    className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]"
+                    className="border-b border-slate-200 last:border-0 hover:bg-slate-50"
                   >
                     <td className="py-2.5 pr-3">
                       <Pill
@@ -291,7 +291,7 @@ function BoardroomDashboard() {
                         {r.impact}
                       </span>
                     </td>
-                    <td className="py-2.5 pr-3 text-slate-300">{r.rec}</td>
+                    <td className="py-2.5 pr-3 text-slate-700">{r.rec}</td>
                     <td
                       className="py-2.5 text-right font-medium"
                       style={{ color: COLORS.teal }}
@@ -314,11 +314,11 @@ function BoardroomDashboard() {
             {RISKS.map((r) => (
               <li
                 key={r.cat}
-                className="flex items-center justify-between rounded-lg border border-white/5 px-3 py-2.5"
-                style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5"
+                style={{ backgroundColor: "#f8fafc" }}
               >
                 <div>
-                  <div className="text-[13px] text-white">{r.cat}</div>
+                  <div className="text-[13px] text-slate-900">{r.cat}</div>
                   <div className="text-[11px] text-slate-500 mt-0.5">{r.note}</div>
                 </div>
                 <div className="text-right">
@@ -342,8 +342,8 @@ function BoardroomDashboard() {
             {OPPORTUNITIES.map((o) => (
               <div
                 key={o.cat}
-                className="rounded-xl border border-white/5 p-4 flex items-start justify-between"
-                style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                className="rounded-xl border border-slate-200 p-4 flex items-start justify-between"
+                style={{ backgroundColor: "#f8fafc" }}
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -358,7 +358,7 @@ function BoardroomDashboard() {
                         }[o.tone],
                       }}
                     />
-                    <span className="text-[13px] text-white">{o.cat}</span>
+                    <span className="text-[13px] text-slate-900">{o.cat}</span>
                   </div>
                   <div className="text-[11px] text-slate-500 mt-1.5">{o.note}</div>
                 </div>
@@ -413,7 +413,7 @@ function Slider({
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[12px] text-slate-300">{label}</span>
+        <span className="text-[12px] text-slate-700">{label}</span>
         <span className="text-[12px] font-medium" style={{ color }}>
           {value}%
         </span>
@@ -426,7 +426,7 @@ function Slider({
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
         style={{
-          background: `linear-gradient(to right, ${color} 0%, ${color} ${value}%, rgba(255,255,255,0.08) ${value}%, rgba(255,255,255,0.08) 100%)`,
+          background: `linear-gradient(to right, ${color} 0%, ${color} ${value}%, #cbd5e1 ${value}%, #cbd5e1 100%)`,
         }}
       />
     </div>
@@ -436,8 +436,8 @@ function Slider({
 function Output({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div
-      className="rounded-lg border border-white/5 p-2.5"
-      style={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+      className="rounded-lg border border-slate-200 p-2.5"
+      style={{ backgroundColor: "#f8fafc" }}
     >
       <div className="text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
       <div

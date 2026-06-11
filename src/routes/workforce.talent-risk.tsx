@@ -66,7 +66,7 @@ function TalentRiskPage() {
         <div className="text-[11px] tracking-[0.18em] text-slate-500 mb-1">
           WORKSPACE · {companyLabel.toUpperCase()}
         </div>
-        <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+        <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
           Talent Risk & Learning
         </h1>
       </div>
@@ -79,7 +79,7 @@ function TalentRiskPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-[12px]">
             <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <th className="text-left py-2 pr-3">Company</th>
                 {RISK_CATS.map((c) => (
                   <th key={c} className="text-center py-2 px-2">{c}</th>
@@ -88,8 +88,8 @@ function TalentRiskPage() {
             </thead>
             <tbody>
               {COMPANIES.map((co, i) => (
-                <tr key={co} className="border-b border-white/5 last:border-0">
-                  <td className="py-2.5 pr-3 text-white text-[13px]">{co}</td>
+                <tr key={co} className="border-b border-slate-200 last:border-0">
+                  <td className="py-2.5 pr-3 text-slate-900 text-[13px]">{co}</td>
                   {HEAT[i].map((lvl, j) => {
                     const c = LEVEL_COLOR[lvl];
                     return (
@@ -123,7 +123,7 @@ function TalentRiskPage() {
         <GlassPanel title="Learning Dashboard" description="L&D engagement and outcomes">
           <div className="grid sm:grid-cols-2 gap-3">
             {LEARN.map((l) => (
-              <div key={l.label} className="rounded-xl border border-white/5 p-4" style={{ backgroundColor: "rgba(255,255,255,0.02)" }}>
+              <div key={l.label} className="rounded-xl border border-slate-200 p-4" style={{ backgroundColor: "#f8fafc" }}>
                 <div className="text-[10px] uppercase tracking-wider text-slate-500">{l.label}</div>
                 <div className="mt-1 text-[20px] font-semibold" style={{ color: l.color, fontFamily: "Outfit, sans-serif" }}>
                   {l.value}
@@ -154,7 +154,7 @@ function TalentRiskPage() {
             {HEALTH.map((h) => (
               <div key={h.metric} className="text-center">
                 <div className="text-[11px] text-slate-500 truncate">{h.metric}</div>
-                <div className="text-[14px] font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>{h.score}</div>
+                <div className="text-[14px] font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>{h.score}</div>
               </div>
             ))}
           </div>
