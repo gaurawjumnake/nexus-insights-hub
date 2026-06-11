@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
+import { Route as WorkforceTalentRiskRouteImport } from './routes/workforce.talent-risk'
 import { Route as WorkforceProductivityRouteImport } from './routes/workforce.productivity'
 import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
 import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const WorkforceIndexRoute = WorkforceIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforceTalentRiskRoute = WorkforceTalentRiskRouteImport.update({
+  id: '/talent-risk',
+  path: '/talent-risk',
   getParentRoute: () => WorkforceRoute,
 } as any)
 const WorkforceProductivityRoute = WorkforceProductivityRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
+  '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
+  '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
   '/workforce': typeof WorkforceIndexRoute
 }
 export interface FileRoutesById {
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
+  '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/workforce/ai-adoption'
     | '/workforce/portfolio'
     | '/workforce/productivity'
+    | '/workforce/talent-risk'
     | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -86,6 +96,7 @@ export interface FileRouteTypes {
     | '/workforce/ai-adoption'
     | '/workforce/portfolio'
     | '/workforce/productivity'
+    | '/workforce/talent-risk'
     | '/workforce'
   id:
     | '__root__'
@@ -94,6 +105,7 @@ export interface FileRouteTypes {
     | '/workforce/ai-adoption'
     | '/workforce/portfolio'
     | '/workforce/productivity'
+    | '/workforce/talent-risk'
     | '/workforce/'
   fileRoutesById: FileRoutesById
 }
@@ -125,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforceIndexRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/workforce/talent-risk': {
+      id: '/workforce/talent-risk'
+      path: '/talent-risk'
+      fullPath: '/workforce/talent-risk'
+      preLoaderRoute: typeof WorkforceTalentRiskRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
     '/workforce/productivity': {
       id: '/workforce/productivity'
       path: '/productivity'
@@ -153,6 +172,7 @@ interface WorkforceRouteChildren {
   WorkforceAiAdoptionRoute: typeof WorkforceAiAdoptionRoute
   WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
   WorkforceProductivityRoute: typeof WorkforceProductivityRoute
+  WorkforceTalentRiskRoute: typeof WorkforceTalentRiskRoute
   WorkforceIndexRoute: typeof WorkforceIndexRoute
 }
 
@@ -160,6 +180,7 @@ const WorkforceRouteChildren: WorkforceRouteChildren = {
   WorkforceAiAdoptionRoute: WorkforceAiAdoptionRoute,
   WorkforcePortfolioRoute: WorkforcePortfolioRoute,
   WorkforceProductivityRoute: WorkforceProductivityRoute,
+  WorkforceTalentRiskRoute: WorkforceTalentRiskRoute,
   WorkforceIndexRoute: WorkforceIndexRoute,
 }
 
