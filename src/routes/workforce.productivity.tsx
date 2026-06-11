@@ -80,7 +80,7 @@ function ProductivityPage() {
         <div className="text-[11px] tracking-[0.18em] text-slate-500 mb-1">
           WORKSPACE · {companyLabel.toUpperCase()}
         </div>
-        <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+        <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
           Productivity & Cost
         </h1>
       </div>
@@ -94,7 +94,7 @@ function ProductivityPage() {
           <div className="h-60">
             <ResponsiveContainer>
               <BarChart data={PROD_BY_CO} margin={{ left: -10, right: 8 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <CartesianGrid stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip contentStyle={chartTip} />
@@ -110,7 +110,7 @@ function ProductivityPage() {
           <div className="h-60">
             <ResponsiveContainer>
               <BarChart data={COST_PER_OUTCOME} margin={{ left: -10, right: 8 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <CartesianGrid stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip contentStyle={chartTip} />
@@ -134,7 +134,7 @@ function ProductivityPage() {
                     <stop offset="100%" stopColor={COLORS.green} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <CartesianGrid stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="m" stroke="#94a3b8" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip contentStyle={chartTip} />
@@ -150,7 +150,7 @@ function ProductivityPage() {
           <div className="h-60">
             <ResponsiveContainer>
               <LineChart data={ROI_COMP} margin={{ left: -10, right: 8 }}>
-                <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <CartesianGrid stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip contentStyle={chartTip} />
@@ -169,7 +169,7 @@ function ProductivityPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-white/5">
+              <tr className="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <th className="text-left py-2 pr-3">Opportunity</th>
                 <th className="text-right py-2 pr-3">Savings</th>
                 <th className="text-left py-2 pr-3">Complexity</th>
@@ -178,8 +178,8 @@ function ProductivityPage() {
             </thead>
             <tbody>
               {OPPS.map((o) => (
-                <tr key={o.cat} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                  <td className="py-2.5 pr-3 text-white">{o.cat}</td>
+                <tr key={o.cat} className="border-b border-slate-200 last:border-0 hover:bg-slate-50">
+                  <td className="py-2.5 pr-3 text-slate-900">{o.cat}</td>
                   <td className="py-2.5 pr-3 text-right font-medium" style={{ color: COLORS.green }}>{o.savings}</td>
                   <td className="py-2.5 pr-3">
                     <Pill

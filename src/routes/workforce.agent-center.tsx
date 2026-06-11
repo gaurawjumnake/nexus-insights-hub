@@ -156,15 +156,15 @@ function AgentCenter() {
     <div className="space-y-6">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+          <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
             AI Talent Agent Center
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 mt-1">
             Multi-agent monitoring · {companyLabel}
           </p>
         </div>
         <button
-          className="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-md font-medium text-white"
+          className="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-md font-medium text-slate-900"
           style={{ background: `linear-gradient(135deg, ${COLORS.indigo}, ${COLORS.teal})` }}
         >
           <Play className="w-3.5 h-3.5" />
@@ -188,10 +188,10 @@ function AgentCenter() {
             return (
               <div
                 key={a.name}
-                className="rounded-xl border border-white/5 p-4"
+                className="rounded-xl border border-slate-200 p-4"
                 style={{
                   background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%), #0d1222",
+                    "linear-gradient(135deg, #f8fafc 0%, rgba(255,255,255,0) 100%), #0d1222",
                 }}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -203,7 +203,7 @@ function AgentCenter() {
                       <Icon className="w-4.5 h-4.5" />
                     </div>
                     <div>
-                      <div className="text-[13px] font-semibold text-white leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
+                      <div className="text-[13px] font-semibold text-slate-900 leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
                         {a.name}
                       </div>
                       <div className="text-[10px] text-slate-500 mt-0.5">Last run · {a.lastRun}</div>
@@ -217,22 +217,22 @@ function AgentCenter() {
                 <div className="mt-3 space-y-2.5">
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-0.5">Findings</div>
-                    <div className="text-[12px] text-slate-300 leading-relaxed">{a.findings}</div>
+                    <div className="text-[12px] text-slate-700 leading-relaxed">{a.findings}</div>
                   </div>
                   <div>
                     <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-0.5">Recommendation</div>
-                    <div className="text-[12px] text-slate-300 leading-relaxed">{a.recommendation}</div>
+                    <div className="text-[12px] text-slate-700 leading-relaxed">{a.recommendation}</div>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] uppercase tracking-wider text-slate-500">Confidence</span>
-                    <span className="text-xs font-semibold text-white tabular-nums">
+                    <span className="text-xs font-semibold text-slate-900 tabular-nums">
                       {a.confidence > 0 ? `${a.confidence}%` : "—"}
                     </span>
                   </div>
-                  <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+                  <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: "#e2e8f0" }}>
                     <div
                       className="h-full"
                       style={{
@@ -269,16 +269,16 @@ function AgentCenter() {
               </thead>
               <tbody>
                 {BOARD_RECS.map((r, i) => (
-                  <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02]">
-                    <td className="px-3 py-2.5 text-white">{r.rec}</td>
+                  <tr key={i} className="border-t border-slate-200 hover:bg-slate-50">
+                    <td className="px-3 py-2.5 text-slate-900">{r.rec}</td>
                     <td className="px-3 py-2.5">
                       <Pill label={r.impact} tone={r.impact === "High" ? "green" : r.impact === "Medium" ? "teal" : "slate"} />
                     </td>
                     <td className="px-3 py-2.5">
                       <Pill label={r.priority} tone={r.priority === "P0" ? "red" : r.priority === "P1" ? "amber" : "indigo"} />
                     </td>
-                    <td className="px-3 py-2.5 text-slate-400">{r.company}</td>
-                    <td className="px-3 py-2.5 text-slate-300 tabular-nums">{r.value}</td>
+                    <td className="px-3 py-2.5 text-slate-600">{r.company}</td>
+                    <td className="px-3 py-2.5 text-slate-700 tabular-nums">{r.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -307,7 +307,7 @@ function AgentCenter() {
                 <div
                   key={i}
                   className="flex items-start gap-3 px-3 py-2.5 rounded-lg"
-                  style={{ background: "rgba(255,255,255,0.02)" }}
+                  style={{ background: "#f8fafc" }}
                 >
                   <div
                     className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
@@ -316,7 +316,7 @@ function AgentCenter() {
                     <Icon className="w-3.5 h-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[12px] text-white leading-tight">{n.title}</div>
+                    <div className="text-[12px] text-slate-900 leading-tight">{n.title}</div>
                     <div className="text-[10px] text-slate-500 mt-0.5">{n.time} ago</div>
                   </div>
                 </div>
@@ -329,7 +329,7 @@ function AgentCenter() {
       {/* Activity Timeline */}
       <GlassPanel title="Activity Timeline" description="Agent executions · data ingestion · KPI refresh · recommendation generation">
         <div className="relative pl-5">
-          <div className="absolute left-2 top-1 bottom-1 w-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+          <div className="absolute left-2 top-1 bottom-1 w-px" style={{ background: "#cbd5e1" }} />
           <div className="space-y-3">
             {TIMELINE.map((t, i) => {
               const tone =
@@ -348,7 +348,7 @@ function AgentCenter() {
                   >
                     <Icon className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs text-slate-300">{t.msg}</span>
+                  <span className="text-xs text-slate-700">{t.msg}</span>
                 </div>
               );
             })}
