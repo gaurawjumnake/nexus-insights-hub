@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
+import { Route as WorkforceProductivityRouteImport } from './routes/workforce.productivity'
 import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
 import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
 
@@ -30,6 +31,11 @@ const WorkforceIndexRoute = WorkforceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const WorkforceProductivityRoute = WorkforceProductivityRouteImport.update({
+  id: '/productivity',
+  path: '/productivity',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 const WorkforcePortfolioRoute = WorkforcePortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
@@ -46,12 +52,14 @@ export interface FileRoutesByFullPath {
   '/workforce': typeof WorkforceRouteWithChildren
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
+  '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
+  '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce': typeof WorkforceIndexRoute
 }
 export interface FileRoutesById {
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/workforce': typeof WorkforceRouteWithChildren
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
+  '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
@@ -69,15 +78,22 @@ export interface FileRouteTypes {
     | '/workforce'
     | '/workforce/ai-adoption'
     | '/workforce/portfolio'
+    | '/workforce/productivity'
     | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/workforce/ai-adoption' | '/workforce/portfolio' | '/workforce'
+  to:
+    | '/'
+    | '/workforce/ai-adoption'
+    | '/workforce/portfolio'
+    | '/workforce/productivity'
+    | '/workforce'
   id:
     | '__root__'
     | '/'
     | '/workforce'
     | '/workforce/ai-adoption'
     | '/workforce/portfolio'
+    | '/workforce/productivity'
     | '/workforce/'
   fileRoutesById: FileRoutesById
 }
@@ -109,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforceIndexRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/workforce/productivity': {
+      id: '/workforce/productivity'
+      path: '/productivity'
+      fullPath: '/workforce/productivity'
+      preLoaderRoute: typeof WorkforceProductivityRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
     '/workforce/portfolio': {
       id: '/workforce/portfolio'
       path: '/portfolio'
@@ -129,12 +152,14 @@ declare module '@tanstack/react-router' {
 interface WorkforceRouteChildren {
   WorkforceAiAdoptionRoute: typeof WorkforceAiAdoptionRoute
   WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
+  WorkforceProductivityRoute: typeof WorkforceProductivityRoute
   WorkforceIndexRoute: typeof WorkforceIndexRoute
 }
 
 const WorkforceRouteChildren: WorkforceRouteChildren = {
   WorkforceAiAdoptionRoute: WorkforceAiAdoptionRoute,
   WorkforcePortfolioRoute: WorkforcePortfolioRoute,
+  WorkforceProductivityRoute: WorkforceProductivityRoute,
   WorkforceIndexRoute: WorkforceIndexRoute,
 }
 
