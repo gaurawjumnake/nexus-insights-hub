@@ -10,6 +10,7 @@ import {
   Bot,
   ChevronRight,
   Activity,
+  Home,
 } from "lucide-react";
 import { PORTFOLIO_COMPANIES, WorkforceProvider, useWorkforce } from "@/lib/workforce-context";
 
@@ -196,6 +197,14 @@ function Header() {
       </div>
 
       <div className="flex items-center gap-3">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-[13px] px-3 py-2 rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-medium"
+          title="Back to Nexus Observatory"
+        >
+          <Home className="w-3.5 h-3.5" />
+          Home
+        </Link>
         <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-teal-50 border border-teal-100">
           <Activity className="w-3.5 h-3.5" style={{ color: "#14b8a6" }} />
           <span className="text-[11px] text-teal-700 font-medium">Live</span>
