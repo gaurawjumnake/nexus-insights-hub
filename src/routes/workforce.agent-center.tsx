@@ -191,7 +191,7 @@ function AgentCenter() {
                 className="rounded-xl border border-slate-200 p-4"
                 style={{
                   background:
-                    "linear-gradient(135deg, #f8fafc 0%, rgba(255,255,255,0) 100%), #0d1222",
+                    "#ffffff",
                 }}
               >
                 <div className="flex items-start justify-between mb-3">

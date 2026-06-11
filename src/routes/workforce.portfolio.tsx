@@ -250,7 +250,7 @@ function PortfolioOverview() {
                 <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={11} width={60} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0d1222",
+                    backgroundColor: "#ffffff",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                     fontSize: 12,
@@ -272,7 +272,7 @@ function PortfolioOverview() {
               <PieChart>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0d1222",
+                    backgroundColor: "#ffffff",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                     fontSize: 12,
@@ -308,7 +308,7 @@ function PortfolioOverview() {
                 <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0d1222",
+                    backgroundColor: "#ffffff",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                     fontSize: 12,
