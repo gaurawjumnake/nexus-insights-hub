@@ -9,38 +9,157 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
+import { Route as WorkforceWorkforceDrilldownRouteImport } from './routes/workforce.workforce-drilldown'
+import { Route as WorkforceTalentRiskRouteImport } from './routes/workforce.talent-risk'
+import { Route as WorkforceProductivityRouteImport } from './routes/workforce.productivity'
+import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
+import { Route as WorkforceDataManagementRouteImport } from './routes/workforce.data-management'
+import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
+import { Route as WorkforceAgentCenterRouteImport } from './routes/workforce.agent-center'
 
+const WorkforceRoute = WorkforceRouteImport.update({
+  id: '/workforce',
+  path: '/workforce',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkforceIndexRoute = WorkforceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforceWorkforceDrilldownRoute =
+  WorkforceWorkforceDrilldownRouteImport.update({
+    id: '/workforce-drilldown',
+    path: '/workforce-drilldown',
+    getParentRoute: () => WorkforceRoute,
+  } as any)
+const WorkforceTalentRiskRoute = WorkforceTalentRiskRouteImport.update({
+  id: '/talent-risk',
+  path: '/talent-risk',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforceProductivityRoute = WorkforceProductivityRouteImport.update({
+  id: '/productivity',
+  path: '/productivity',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforcePortfolioRoute = WorkforcePortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforceDataManagementRoute = WorkforceDataManagementRouteImport.update({
+  id: '/data-management',
+  path: '/data-management',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforceAiAdoptionRoute = WorkforceAiAdoptionRouteImport.update({
+  id: '/ai-adoption',
+  path: '/ai-adoption',
+  getParentRoute: () => WorkforceRoute,
+} as any)
+const WorkforceAgentCenterRoute = WorkforceAgentCenterRouteImport.update({
+  id: '/agent-center',
+  path: '/agent-center',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/agent-center': typeof WorkforceAgentCenterRoute
+  '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
+  '/workforce/data-management': typeof WorkforceDataManagementRoute
+  '/workforce/portfolio': typeof WorkforcePortfolioRoute
+  '/workforce/productivity': typeof WorkforceProductivityRoute
+  '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
+  '/workforce/workforce-drilldown': typeof WorkforceWorkforceDrilldownRoute
+  '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/workforce/agent-center': typeof WorkforceAgentCenterRoute
+  '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
+  '/workforce/data-management': typeof WorkforceDataManagementRoute
+  '/workforce/portfolio': typeof WorkforcePortfolioRoute
+  '/workforce/productivity': typeof WorkforceProductivityRoute
+  '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
+  '/workforce/workforce-drilldown': typeof WorkforceWorkforceDrilldownRoute
+  '/workforce': typeof WorkforceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/agent-center': typeof WorkforceAgentCenterRoute
+  '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
+  '/workforce/data-management': typeof WorkforceDataManagementRoute
+  '/workforce/portfolio': typeof WorkforcePortfolioRoute
+  '/workforce/productivity': typeof WorkforceProductivityRoute
+  '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
+  '/workforce/workforce-drilldown': typeof WorkforceWorkforceDrilldownRoute
+  '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/workforce'
+    | '/workforce/agent-center'
+    | '/workforce/ai-adoption'
+    | '/workforce/data-management'
+    | '/workforce/portfolio'
+    | '/workforce/productivity'
+    | '/workforce/talent-risk'
+    | '/workforce/workforce-drilldown'
+    | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/workforce/agent-center'
+    | '/workforce/ai-adoption'
+    | '/workforce/data-management'
+    | '/workforce/portfolio'
+    | '/workforce/productivity'
+    | '/workforce/talent-risk'
+    | '/workforce/workforce-drilldown'
+    | '/workforce'
+  id:
+    | '__root__'
+    | '/'
+    | '/workforce'
+    | '/workforce/agent-center'
+    | '/workforce/ai-adoption'
+    | '/workforce/data-management'
+    | '/workforce/portfolio'
+    | '/workforce/productivity'
+    | '/workforce/talent-risk'
+    | '/workforce/workforce-drilldown'
+    | '/workforce/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  WorkforceRoute: typeof WorkforceRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workforce': {
+      id: '/workforce'
+      path: '/workforce'
+      fullPath: '/workforce'
+      preLoaderRoute: typeof WorkforceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +167,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workforce/': {
+      id: '/workforce/'
+      path: '/'
+      fullPath: '/workforce/'
+      preLoaderRoute: typeof WorkforceIndexRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/workforce-drilldown': {
+      id: '/workforce/workforce-drilldown'
+      path: '/workforce-drilldown'
+      fullPath: '/workforce/workforce-drilldown'
+      preLoaderRoute: typeof WorkforceWorkforceDrilldownRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/talent-risk': {
+      id: '/workforce/talent-risk'
+      path: '/talent-risk'
+      fullPath: '/workforce/talent-risk'
+      preLoaderRoute: typeof WorkforceTalentRiskRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/productivity': {
+      id: '/workforce/productivity'
+      path: '/productivity'
+      fullPath: '/workforce/productivity'
+      preLoaderRoute: typeof WorkforceProductivityRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/portfolio': {
+      id: '/workforce/portfolio'
+      path: '/portfolio'
+      fullPath: '/workforce/portfolio'
+      preLoaderRoute: typeof WorkforcePortfolioRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/data-management': {
+      id: '/workforce/data-management'
+      path: '/data-management'
+      fullPath: '/workforce/data-management'
+      preLoaderRoute: typeof WorkforceDataManagementRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/ai-adoption': {
+      id: '/workforce/ai-adoption'
+      path: '/ai-adoption'
+      fullPath: '/workforce/ai-adoption'
+      preLoaderRoute: typeof WorkforceAiAdoptionRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/agent-center': {
+      id: '/workforce/agent-center'
+      path: '/agent-center'
+      fullPath: '/workforce/agent-center'
+      preLoaderRoute: typeof WorkforceAgentCenterRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
   }
 }
 
+interface WorkforceRouteChildren {
+  WorkforceAgentCenterRoute: typeof WorkforceAgentCenterRoute
+  WorkforceAiAdoptionRoute: typeof WorkforceAiAdoptionRoute
+  WorkforceDataManagementRoute: typeof WorkforceDataManagementRoute
+  WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
+  WorkforceProductivityRoute: typeof WorkforceProductivityRoute
+  WorkforceTalentRiskRoute: typeof WorkforceTalentRiskRoute
+  WorkforceWorkforceDrilldownRoute: typeof WorkforceWorkforceDrilldownRoute
+  WorkforceIndexRoute: typeof WorkforceIndexRoute
+}
+
+const WorkforceRouteChildren: WorkforceRouteChildren = {
+  WorkforceAgentCenterRoute: WorkforceAgentCenterRoute,
+  WorkforceAiAdoptionRoute: WorkforceAiAdoptionRoute,
+  WorkforceDataManagementRoute: WorkforceDataManagementRoute,
+  WorkforcePortfolioRoute: WorkforcePortfolioRoute,
+  WorkforceProductivityRoute: WorkforceProductivityRoute,
+  WorkforceTalentRiskRoute: WorkforceTalentRiskRoute,
+  WorkforceWorkforceDrilldownRoute: WorkforceWorkforceDrilldownRoute,
+  WorkforceIndexRoute: WorkforceIndexRoute,
+}
+
+const WorkforceRouteWithChildren = WorkforceRoute._addFileChildren(
+  WorkforceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  WorkforceRoute: WorkforceRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
