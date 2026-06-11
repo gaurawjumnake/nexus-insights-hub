@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
+import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
 
 const WorkforceRoute = WorkforceRouteImport.update({
   id: '/workforce',
@@ -28,28 +29,36 @@ const WorkforceIndexRoute = WorkforceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const WorkforcePortfolioRoute = WorkforcePortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce': typeof WorkforceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/workforce' | '/workforce/'
+  fullPaths: '/' | '/workforce' | '/workforce/portfolio' | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/workforce'
-  id: '__root__' | '/' | '/workforce' | '/workforce/'
+  to: '/' | '/workforce/portfolio' | '/workforce'
+  id: '__root__' | '/' | '/workforce' | '/workforce/portfolio' | '/workforce/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -80,14 +89,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforceIndexRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/workforce/portfolio': {
+      id: '/workforce/portfolio'
+      path: '/portfolio'
+      fullPath: '/workforce/portfolio'
+      preLoaderRoute: typeof WorkforcePortfolioRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
   }
 }
 
 interface WorkforceRouteChildren {
+  WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
   WorkforceIndexRoute: typeof WorkforceIndexRoute
 }
 
 const WorkforceRouteChildren: WorkforceRouteChildren = {
+  WorkforcePortfolioRoute: WorkforcePortfolioRoute,
   WorkforceIndexRoute: WorkforceIndexRoute,
 }
 
