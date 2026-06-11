@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
+import { Route as WorkforceWorkforceDrilldownRouteImport } from './routes/workforce.workforce-drilldown'
 import { Route as WorkforceTalentRiskRouteImport } from './routes/workforce.talent-risk'
 import { Route as WorkforceProductivityRouteImport } from './routes/workforce.productivity'
 import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
@@ -32,6 +33,12 @@ const WorkforceIndexRoute = WorkforceIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const WorkforceWorkforceDrilldownRoute =
+  WorkforceWorkforceDrilldownRouteImport.update({
+    id: '/workforce-drilldown',
+    path: '/workforce-drilldown',
+    getParentRoute: () => WorkforceRoute,
+  } as any)
 const WorkforceTalentRiskRoute = WorkforceTalentRiskRouteImport.update({
   id: '/talent-risk',
   path: '/talent-risk',
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
+  '/workforce/workforce-drilldown': typeof WorkforceWorkforceDrilldownRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +76,7 @@ export interface FileRoutesByTo {
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
+  '/workforce/workforce-drilldown': typeof WorkforceWorkforceDrilldownRoute
   '/workforce': typeof WorkforceIndexRoute
 }
 export interface FileRoutesById {
@@ -78,6 +87,7 @@ export interface FileRoutesById {
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
+  '/workforce/workforce-drilldown': typeof WorkforceWorkforceDrilldownRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/workforce/portfolio'
     | '/workforce/productivity'
     | '/workforce/talent-risk'
+    | '/workforce/workforce-drilldown'
     | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/workforce/portfolio'
     | '/workforce/productivity'
     | '/workforce/talent-risk'
+    | '/workforce/workforce-drilldown'
     | '/workforce'
   id:
     | '__root__'
@@ -106,6 +118,7 @@ export interface FileRouteTypes {
     | '/workforce/portfolio'
     | '/workforce/productivity'
     | '/workforce/talent-risk'
+    | '/workforce/workforce-drilldown'
     | '/workforce/'
   fileRoutesById: FileRoutesById
 }
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/workforce/'
       preLoaderRoute: typeof WorkforceIndexRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
+    '/workforce/workforce-drilldown': {
+      id: '/workforce/workforce-drilldown'
+      path: '/workforce-drilldown'
+      fullPath: '/workforce/workforce-drilldown'
+      preLoaderRoute: typeof WorkforceWorkforceDrilldownRouteImport
       parentRoute: typeof WorkforceRoute
     }
     '/workforce/talent-risk': {
@@ -173,6 +193,7 @@ interface WorkforceRouteChildren {
   WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
   WorkforceProductivityRoute: typeof WorkforceProductivityRoute
   WorkforceTalentRiskRoute: typeof WorkforceTalentRiskRoute
+  WorkforceWorkforceDrilldownRoute: typeof WorkforceWorkforceDrilldownRoute
   WorkforceIndexRoute: typeof WorkforceIndexRoute
 }
 
@@ -181,6 +202,7 @@ const WorkforceRouteChildren: WorkforceRouteChildren = {
   WorkforcePortfolioRoute: WorkforcePortfolioRoute,
   WorkforceProductivityRoute: WorkforceProductivityRoute,
   WorkforceTalentRiskRoute: WorkforceTalentRiskRoute,
+  WorkforceWorkforceDrilldownRoute: WorkforceWorkforceDrilldownRoute,
   WorkforceIndexRoute: WorkforceIndexRoute,
 }
 
