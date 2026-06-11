@@ -17,7 +17,15 @@ export const Route = createFileRoute("/workforce")({
   component: WorkforceLayout,
 });
 
-const NAV = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+};
+type NavGroup = { section: string; items: NavItem[] };
+
+const NAV: NavGroup[] = [
   {
     section: "OVERVIEW",
     items: [
@@ -49,7 +57,7 @@ const NAV = [
     section: "AGENT CENTER",
     items: [{ to: "/workforce/agent-center", label: "AI Talent Agent Center", icon: Bot }],
   },
-] as const;
+];
 
 function WorkforceLayout() {
   return (
