@@ -10,6 +10,7 @@ import {
   Bot,
   ChevronRight,
   Activity,
+  Home,
 } from "lucide-react";
 import { PORTFOLIO_COMPANIES, WorkforceProvider, useWorkforce } from "@/lib/workforce-context";
 
