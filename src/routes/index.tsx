@@ -740,10 +740,12 @@ function NexusDashboard() {
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 Context
               </span>
-              <button className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50">
-                All Portfolio (Fortive Group)
-                <ChevronDown className="h-4 w-4 text-slate-400" />
-              </button>
+              <select className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="all">◈ All Portfolio (Fortive Group)</option>
+                <option value="gordion">Gordion · Industrial IoT · Growth</option>
+                <option value="provation">Provation · Healthcare IT · Series C</option>
+                <option value="fluke">Fluke · Test &amp; Measurement · Mature</option>
+              </select>
             </div>
           </div>
           <div className="flex items-center gap-3">
