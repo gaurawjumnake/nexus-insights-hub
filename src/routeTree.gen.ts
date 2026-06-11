@@ -13,6 +13,7 @@ import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
 import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
+import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
 
 const WorkforceRoute = WorkforceRouteImport.update({
   id: '/workforce',
@@ -34,15 +35,22 @@ const WorkforcePortfolioRoute = WorkforcePortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const WorkforceAiAdoptionRoute = WorkforceAiAdoptionRouteImport.update({
+  id: '/ai-adoption',
+  path: '/ai-adoption',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce': typeof WorkforceIndexRoute
 }
@@ -50,15 +58,27 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/workforce' | '/workforce/portfolio' | '/workforce/'
+  fullPaths:
+    | '/'
+    | '/workforce'
+    | '/workforce/ai-adoption'
+    | '/workforce/portfolio'
+    | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/workforce/portfolio' | '/workforce'
-  id: '__root__' | '/' | '/workforce' | '/workforce/portfolio' | '/workforce/'
+  to: '/' | '/workforce/ai-adoption' | '/workforce/portfolio' | '/workforce'
+  id:
+    | '__root__'
+    | '/'
+    | '/workforce'
+    | '/workforce/ai-adoption'
+    | '/workforce/portfolio'
+    | '/workforce/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,15 +116,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforcePortfolioRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/workforce/ai-adoption': {
+      id: '/workforce/ai-adoption'
+      path: '/ai-adoption'
+      fullPath: '/workforce/ai-adoption'
+      preLoaderRoute: typeof WorkforceAiAdoptionRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
   }
 }
 
 interface WorkforceRouteChildren {
+  WorkforceAiAdoptionRoute: typeof WorkforceAiAdoptionRoute
   WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
   WorkforceIndexRoute: typeof WorkforceIndexRoute
 }
 
 const WorkforceRouteChildren: WorkforceRouteChildren = {
+  WorkforceAiAdoptionRoute: WorkforceAiAdoptionRoute,
   WorkforcePortfolioRoute: WorkforcePortfolioRoute,
   WorkforceIndexRoute: WorkforceIndexRoute,
 }
