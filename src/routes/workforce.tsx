@@ -126,7 +126,7 @@ function Sidebar() {
                 return (
                   <Link
                     key={item.to}
-                    to={item.to}
+                    to={item.to as "/workforce"}
                     className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-colors ${
                       active
                         ? "bg-white/5 text-white"
