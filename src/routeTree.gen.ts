@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
 
 const WorkforceRoute = WorkforceRouteImport.update({
   id: '/workforce',
@@ -22,31 +23,38 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkforceIndexRoute = WorkforceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/workforce': typeof WorkforceRoute
+  '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/workforce': typeof WorkforceRoute
+  '/workforce': typeof WorkforceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/workforce': typeof WorkforceRoute
+  '/workforce': typeof WorkforceRouteWithChildren
+  '/workforce/': typeof WorkforceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/workforce'
+  fullPaths: '/' | '/workforce' | '/workforce/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/workforce'
-  id: '__root__' | '/' | '/workforce'
+  id: '__root__' | '/' | '/workforce' | '/workforce/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  WorkforceRoute: typeof WorkforceRoute
+  WorkforceRoute: typeof WorkforceRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,13 +73,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workforce/': {
+      id: '/workforce/'
+      path: '/'
+      fullPath: '/workforce/'
+      preLoaderRoute: typeof WorkforceIndexRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
   }
 }
 
+interface WorkforceRouteChildren {
+  WorkforceIndexRoute: typeof WorkforceIndexRoute
+}
+
+const WorkforceRouteChildren: WorkforceRouteChildren = {
+  WorkforceIndexRoute: WorkforceIndexRoute,
+}
+
+const WorkforceRouteWithChildren = WorkforceRoute._addFileChildren(
+  WorkforceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  WorkforceRoute: WorkforceRoute,
+  WorkforceRoute: WorkforceRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
