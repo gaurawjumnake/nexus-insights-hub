@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Activity,
@@ -14,6 +14,7 @@ import {
   Globe,
   BarChart3,
   Info,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
