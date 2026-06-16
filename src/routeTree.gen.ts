@@ -17,6 +17,7 @@ import { Route as WorkforceTalentRiskRouteImport } from './routes/workforce.tale
 import { Route as WorkforceProductivityRouteImport } from './routes/workforce.productivity'
 import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
 import { Route as WorkforceDataManagementRouteImport } from './routes/workforce.data-management'
+import { Route as WorkforceBusinessRouteImport } from './routes/workforce.business'
 import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
 import { Route as WorkforceAgentCenterRouteImport } from './routes/workforce.agent-center'
 
@@ -61,6 +62,11 @@ const WorkforceDataManagementRoute = WorkforceDataManagementRouteImport.update({
   path: '/data-management',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const WorkforceBusinessRoute = WorkforceBusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 const WorkforceAiAdoptionRoute = WorkforceAiAdoptionRouteImport.update({
   id: '/ai-adoption',
   path: '/ai-adoption',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/workforce': typeof WorkforceRouteWithChildren
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
+  '/workforce/business': typeof WorkforceBusinessRoute
   '/workforce/data-management': typeof WorkforceDataManagementRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
+  '/workforce/business': typeof WorkforceBusinessRoute
   '/workforce/data-management': typeof WorkforceDataManagementRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/workforce': typeof WorkforceRouteWithChildren
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
+  '/workforce/business': typeof WorkforceBusinessRoute
   '/workforce/data-management': typeof WorkforceDataManagementRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/workforce'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
+    | '/workforce/business'
     | '/workforce/data-management'
     | '/workforce/portfolio'
     | '/workforce/productivity'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
+    | '/workforce/business'
     | '/workforce/data-management'
     | '/workforce/portfolio'
     | '/workforce/productivity'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/workforce'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
+    | '/workforce/business'
     | '/workforce/data-management'
     | '/workforce/portfolio'
     | '/workforce/productivity'
@@ -209,6 +221,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforceDataManagementRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/workforce/business': {
+      id: '/workforce/business'
+      path: '/business'
+      fullPath: '/workforce/business'
+      preLoaderRoute: typeof WorkforceBusinessRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
     '/workforce/ai-adoption': {
       id: '/workforce/ai-adoption'
       path: '/ai-adoption'
@@ -229,6 +248,7 @@ declare module '@tanstack/react-router' {
 interface WorkforceRouteChildren {
   WorkforceAgentCenterRoute: typeof WorkforceAgentCenterRoute
   WorkforceAiAdoptionRoute: typeof WorkforceAiAdoptionRoute
+  WorkforceBusinessRoute: typeof WorkforceBusinessRoute
   WorkforceDataManagementRoute: typeof WorkforceDataManagementRoute
   WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
   WorkforceProductivityRoute: typeof WorkforceProductivityRoute
@@ -240,6 +260,7 @@ interface WorkforceRouteChildren {
 const WorkforceRouteChildren: WorkforceRouteChildren = {
   WorkforceAgentCenterRoute: WorkforceAgentCenterRoute,
   WorkforceAiAdoptionRoute: WorkforceAiAdoptionRoute,
+  WorkforceBusinessRoute: WorkforceBusinessRoute,
   WorkforceDataManagementRoute: WorkforceDataManagementRoute,
   WorkforcePortfolioRoute: WorkforcePortfolioRoute,
   WorkforceProductivityRoute: WorkforceProductivityRoute,
