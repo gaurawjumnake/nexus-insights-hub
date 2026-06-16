@@ -180,6 +180,10 @@ function Sidebar() {
 
 const PERSONA_META: Record<string, { label: string; tone: string; focus: string }> = {
   all: { label: "All Personas", tone: "bg-slate-100 text-slate-700 border-slate-200", focus: "Holistic view across revenue, EBITDA, adoption, risk & efficiency." },
+  cxo: { label: "CXO", tone: "bg-indigo-50 text-indigo-700 border-indigo-200", focus: "Strategic value creation, EBITDA uplift, portfolio AI maturity." },
+  business: { label: "Business", tone: "bg-emerald-50 text-emerald-700 border-emerald-200", focus: "Value creation, revenue growth, profitability, functional impact & replication." },
+  technology: { label: "Technology", tone: "bg-sky-50 text-sky-700 border-sky-200", focus: "AI tool adoption, platform maturity, agent fleet performance." },
+  operations: { label: "Operations", tone: "bg-amber-50 text-amber-700 border-amber-200", focus: "Operational efficiency, automation depth, workforce productivity." },
   ceo: { label: "CEO", tone: "bg-indigo-50 text-indigo-700 border-indigo-200", focus: "Strategic value creation, EBITDA uplift, portfolio AI maturity." },
   cfo: { label: "CFO", tone: "bg-emerald-50 text-emerald-700 border-emerald-200", focus: "Cost productivity, AI ROI, license rationalization, EBITDA flow." },
   coo: { label: "COO", tone: "bg-amber-50 text-amber-700 border-amber-200", focus: "Operational efficiency, automation depth, workforce productivity." },
