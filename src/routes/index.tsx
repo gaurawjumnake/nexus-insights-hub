@@ -846,7 +846,7 @@ function NexusDashboard() {
           </nav>
           <Link
             to="/workforce"
-            search={{ persona }}
+            search={{ persona } as never}
             className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-indigo-500 to-teal-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-600 hover:to-teal-600"
           >
             View Detail Insights ({PERSONAS.find((p) => p.id === persona)?.label})
