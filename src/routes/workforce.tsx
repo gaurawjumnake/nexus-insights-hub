@@ -178,8 +178,20 @@ function Sidebar() {
   );
 }
 
+const PERSONA_META: Record<string, { label: string; tone: string; focus: string }> = {
+  all: { label: "All Personas", tone: "bg-slate-100 text-slate-700 border-slate-200", focus: "Holistic view across revenue, EBITDA, adoption, risk & efficiency." },
+  ceo: { label: "CEO", tone: "bg-indigo-50 text-indigo-700 border-indigo-200", focus: "Strategic value creation, EBITDA uplift, portfolio AI maturity." },
+  cfo: { label: "CFO", tone: "bg-emerald-50 text-emerald-700 border-emerald-200", focus: "Cost productivity, AI ROI, license rationalization, EBITDA flow." },
+  coo: { label: "COO", tone: "bg-amber-50 text-amber-700 border-amber-200", focus: "Operational efficiency, automation depth, workforce productivity." },
+  cio: { label: "CIO/CTO", tone: "bg-sky-50 text-sky-700 border-sky-200", focus: "AI tool adoption, platform maturity, agent fleet performance." },
+  chro: { label: "CHRO", tone: "bg-rose-50 text-rose-700 border-rose-200", focus: "Talent risk, attrition, AI upskilling and organizational health." },
+};
+
 function Header() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.search as { persona?: string } });
+  const personaKey = (search?.persona ?? "all").toLowerCase();
+  const persona = PERSONA_META[personaKey] ?? PERSONA_META.all;
   const { company, setCompany } = useWorkforce();
 
   const current = NAV.flatMap((g) => g.items).find((i) =>
@@ -188,11 +200,14 @@ function Header() {
 
   return (
     <header className="h-16 px-6 flex items-center justify-between border-b border-slate-200 bg-white">
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-3 text-sm">
         <span className="text-slate-500">PE Control Tower</span>
         <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         <span className="text-slate-900 font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>
           {current?.label ?? "Boardroom Dashboard"}
+        </span>
+        <span className={`ml-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[11px] font-semibold ${persona.tone}`} title={persona.focus}>
+          Persona · {persona.label}
         </span>
       </div>
 
