@@ -17,6 +17,7 @@ import { Route as WorkforceTechnologyRouteImport } from './routes/workforce.tech
 import { Route as WorkforceTalentRiskRouteImport } from './routes/workforce.talent-risk'
 import { Route as WorkforceProductivityRouteImport } from './routes/workforce.productivity'
 import { Route as WorkforcePortfolioRouteImport } from './routes/workforce.portfolio'
+import { Route as WorkforceOperationsRouteImport } from './routes/workforce.operations'
 import { Route as WorkforceDataManagementRouteImport } from './routes/workforce.data-management'
 import { Route as WorkforceBusinessRouteImport } from './routes/workforce.business'
 import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
@@ -63,6 +64,11 @@ const WorkforcePortfolioRoute = WorkforcePortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const WorkforceOperationsRoute = WorkforceOperationsRouteImport.update({
+  id: '/operations',
+  path: '/operations',
+  getParentRoute: () => WorkforceRoute,
+} as any)
 const WorkforceDataManagementRoute = WorkforceDataManagementRouteImport.update({
   id: '/data-management',
   path: '/data-management',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
   '/workforce/data-management': typeof WorkforceDataManagementRoute
+  '/workforce/operations': typeof WorkforceOperationsRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
   '/workforce/data-management': typeof WorkforceDataManagementRoute
+  '/workforce/operations': typeof WorkforceOperationsRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
   '/workforce/data-management': typeof WorkforceDataManagementRoute
+  '/workforce/operations': typeof WorkforceOperationsRoute
   '/workforce/portfolio': typeof WorkforcePortfolioRoute
   '/workforce/productivity': typeof WorkforceProductivityRoute
   '/workforce/talent-risk': typeof WorkforceTalentRiskRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/workforce/ai-adoption'
     | '/workforce/business'
     | '/workforce/data-management'
+    | '/workforce/operations'
     | '/workforce/portfolio'
     | '/workforce/productivity'
     | '/workforce/talent-risk'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/workforce/ai-adoption'
     | '/workforce/business'
     | '/workforce/data-management'
+    | '/workforce/operations'
     | '/workforce/portfolio'
     | '/workforce/productivity'
     | '/workforce/talent-risk'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/workforce/ai-adoption'
     | '/workforce/business'
     | '/workforce/data-management'
+    | '/workforce/operations'
     | '/workforce/portfolio'
     | '/workforce/productivity'
     | '/workforce/talent-risk'
@@ -233,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforcePortfolioRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/workforce/operations': {
+      id: '/workforce/operations'
+      path: '/operations'
+      fullPath: '/workforce/operations'
+      preLoaderRoute: typeof WorkforceOperationsRouteImport
+      parentRoute: typeof WorkforceRoute
+    }
     '/workforce/data-management': {
       id: '/workforce/data-management'
       path: '/data-management'
@@ -269,6 +288,7 @@ interface WorkforceRouteChildren {
   WorkforceAiAdoptionRoute: typeof WorkforceAiAdoptionRoute
   WorkforceBusinessRoute: typeof WorkforceBusinessRoute
   WorkforceDataManagementRoute: typeof WorkforceDataManagementRoute
+  WorkforceOperationsRoute: typeof WorkforceOperationsRoute
   WorkforcePortfolioRoute: typeof WorkforcePortfolioRoute
   WorkforceProductivityRoute: typeof WorkforceProductivityRoute
   WorkforceTalentRiskRoute: typeof WorkforceTalentRiskRoute
@@ -282,6 +302,7 @@ const WorkforceRouteChildren: WorkforceRouteChildren = {
   WorkforceAiAdoptionRoute: WorkforceAiAdoptionRoute,
   WorkforceBusinessRoute: WorkforceBusinessRoute,
   WorkforceDataManagementRoute: WorkforceDataManagementRoute,
+  WorkforceOperationsRoute: WorkforceOperationsRoute,
   WorkforcePortfolioRoute: WorkforcePortfolioRoute,
   WorkforceProductivityRoute: WorkforceProductivityRoute,
   WorkforceTalentRiskRoute: WorkforceTalentRiskRoute,
