@@ -747,13 +747,6 @@ function NexusDashboard() {
                 <option value="provation">Provation · Healthcare IT · Series C</option>
                 <option value="fluke">Fluke · Test &amp; Measurement · Mature</option>
               </select>
-              <Link
-                to="/workforce"
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-indigo-500 to-teal-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-600 hover:to-teal-600"
-              >
-                View Detail Insights
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -831,7 +824,7 @@ function NexusDashboard() {
         </div>
 
         {/* Sub tabs */}
-        <div className="mt-4 border-b border-slate-200">
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200">
           <nav className="flex flex-wrap gap-1">
             {SUBTABS.map((t) => {
               const active = subTab === t.id;
@@ -851,6 +844,14 @@ function NexusDashboard() {
               );
             })}
           </nav>
+          <Link
+            to="/workforce"
+            search={{ persona } as never}
+            className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-indigo-500 to-teal-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-600 hover:to-teal-600"
+          >
+            View Detail Insights ({PERSONAS.find((p) => p.id === persona)?.label})
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
 
         {/* Sections */}
