@@ -747,13 +747,6 @@ function NexusDashboard() {
                 <option value="provation">Provation · Healthcare IT · Series C</option>
                 <option value="fluke">Fluke · Test &amp; Measurement · Mature</option>
               </select>
-              <Link
-                to="/workforce"
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-indigo-500 to-teal-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-600 hover:to-teal-600"
-              >
-                View Detail Insights
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
             </div>
           </div>
           <div className="flex items-center gap-3">
