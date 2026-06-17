@@ -8,6 +8,7 @@ import {
   Settings2,
   Users,
   Upload,
+  GitCompare,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const NAV: NavItem[] = [
   { to: "/workforce/technology", label: "Technology", icon: Cpu },
   { to: "/workforce/operations", label: "Operations", icon: Settings2 },
   { to: "/workforce/portfolio", label: "Portfolio", icon: LayoutDashboard },
+  { to: "/compare", label: "PortCo Comparison", icon: GitCompare },
   { to: "/upload", label: "Upload Documents", icon: Upload },
 ];
 
