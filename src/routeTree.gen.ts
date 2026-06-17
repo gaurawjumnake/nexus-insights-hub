@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
+import { Route as UploadRouteImport } from './routes/upload'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
 import { Route as WorkforceWorkforceDrilldownRouteImport } from './routes/workforce.workforce-drilldown'
@@ -26,6 +27,11 @@ import { Route as WorkforceAgentCenterRouteImport } from './routes/workforce.age
 const WorkforceRoute = WorkforceRouteImport.update({
   id: '/workforce',
   path: '/workforce',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -92,6 +98,7 @@ const WorkforceAgentCenterRoute = WorkforceAgentCenterRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
   '/workforce': typeof WorkforceRouteWithChildren
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
@@ -122,6 +130,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
   '/workforce': typeof WorkforceRouteWithChildren
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/upload'
     | '/workforce'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/upload'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
     | '/workforce/business'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/upload'
     | '/workforce'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
@@ -184,6 +196,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  UploadRoute: typeof UploadRoute
   WorkforceRoute: typeof WorkforceRouteWithChildren
 }
 
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/workforce'
       fullPath: '/workforce'
       preLoaderRoute: typeof WorkforceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -317,6 +337,7 @@ const WorkforceRouteWithChildren = WorkforceRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  UploadRoute: UploadRoute,
   WorkforceRoute: WorkforceRouteWithChildren,
 }
 export const routeTree = rootRouteImport

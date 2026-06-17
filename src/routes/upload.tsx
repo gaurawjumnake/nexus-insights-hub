@@ -108,7 +108,7 @@ function UploadPage() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 pr-56"
+      className="min-h-screen bg-slate-50"
       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
     >
       <div className="max-w-4xl mx-auto px-8 py-10">
