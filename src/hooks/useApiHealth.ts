@@ -5,8 +5,9 @@
  */
 import { useQuery } from '@tanstack/react-query'
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+import { getApiBaseUrl, API_BASE_URL_EVENT } from '@/config/api'
+import { useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 export type ApiHealthStatus = 'connected' | 'empty' | 'offline'
 
