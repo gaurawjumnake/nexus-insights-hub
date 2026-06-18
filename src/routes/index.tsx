@@ -750,12 +750,28 @@ function NexusDashboard() {
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 Context
               </span>
-              <select className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                <option value="all">◈ All Portfolio (Fortive Group)</option>
-                <option value="gordion">Gordion · Industrial IoT · Growth</option>
-                <option value="provation">Provation · Healthcare IT · Series C</option>
-                <option value="fluke">Fluke · Test &amp; Measurement · Mature</option>
+              <select
+                value={contextId}
+                onChange={(e) => setContextId(e.target.value)}
+                disabled={portfolio.isLoadingCompanies}
+                className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60"
+              >
+                <option value="all">◈ All Portfolio</option>
+                {portfolio.companies.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                    {c.sector ? ` · ${c.sector}` : ""}
+                  </option>
+                ))}
               </select>
+              {portfolio.error && (
+                <span
+                  className="flex items-center gap-1 text-[11px] text-rose-600"
+                  title={portfolio.error.message}
+                >
+                  <AlertCircle className="h-3.5 w-3.5" /> KPI API offline
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-3">
