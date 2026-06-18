@@ -2,12 +2,11 @@
  * useApiHealth.ts
  * Lightweight backend reachability check against GET /kpis.
  * Cached for 60s, retries failed requests once.
+ * Re-runs when the API base URL changes (sidebar config).
  */
-import { useQuery } from '@tanstack/react-query'
-
-import { getApiBaseUrl, API_BASE_URL_EVENT } from '@/config/api'
 import { useEffect } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getApiBaseUrl, API_BASE_URL_EVENT } from '@/config/api'
 
 export type ApiHealthStatus = 'connected' | 'empty' | 'offline'
 
@@ -20,7 +19,7 @@ async function probe(): Promise<ApiHealthResult> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    const res = await fetch(`${API_BASE}/kpis`, {
+    const res = await fetch(`${getApiBaseUrl()}/kpis`, {
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
     })
@@ -28,7 +27,6 @@ async function probe(): Promise<ApiHealthResult> {
       return { status: 'offline', checkedAt: Date.now() }
     }
     if (!res.ok) {
-      // 4xx — endpoint exists but rejected; treat as reachable-with-no-data
       return { status: 'empty', checkedAt: Date.now() }
     }
     const data = await res.json().catch(() => null)
@@ -49,6 +47,15 @@ async function probe(): Promise<ApiHealthResult> {
 }
 
 export function useApiHealth() {
+  const qc = useQueryClient()
+  useEffect(() => {
+    const handler = () => {
+      qc.invalidateQueries({ queryKey: ['api-health'] })
+    }
+    window.addEventListener(API_BASE_URL_EVENT, handler)
+    return () => window.removeEventListener(API_BASE_URL_EVENT, handler)
+  }, [qc])
+
   return useQuery({
     queryKey: ['api-health'],
     queryFn: probe,
