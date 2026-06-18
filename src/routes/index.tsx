@@ -1,22 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Activity,
   TrendingUp,
   TrendingDown,
-  DollarSign,
   Users,
   Zap,
   Download,
   Plus,
   Trash2,
-  ChevronDown,
   Globe,
   BarChart3,
   Info,
   ArrowRight,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePortfolioKpis, selectContextKpis } from "@/hooks/usePortfolioKpis";
+import { kpi as kpiOf } from "@/lib/normaliseKpi";
 
 export const Route = createFileRoute("/")({
   head: () => ({
