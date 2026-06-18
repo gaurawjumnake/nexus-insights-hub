@@ -789,10 +789,12 @@ function NexusDashboard() {
       </header>
 
       <main className="mx-auto max-w-[1400px] px-6 py-6">
-        {/* Summary KPIs */}
+        {/* Summary KPIs — live data */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {SUMMARY.map((k) => {
+          {SUMMARY_DEFS.map((k) => {
             const Icon = k.icon;
+            const loading = portfolio.isLoadingKpis;
+            const display = kpiOf(activeKpis, k.kpiId, "—");
             return (
               <div
                 key={k.label}
@@ -804,8 +806,16 @@ function NexusDashboard() {
                   </div>
                   <Icon className="h-3.5 w-3.5 text-slate-400" />
                 </div>
-                <div className="mt-2 text-2xl font-semibold tracking-tight">{k.value}</div>
-                <div className="mt-1 text-[11px] font-medium text-emerald-600">{k.delta}</div>
+                <div className="mt-2 text-2xl font-semibold tracking-tight">
+                  {loading ? (
+                    <span className="inline-block h-6 w-20 animate-pulse rounded bg-slate-200" />
+                  ) : (
+                    display
+                  )}
+                </div>
+                <div className="mt-1 text-[11px] font-medium text-slate-400">
+                  {contextId === "all" ? "Portfolio rollup" : contextId}
+                </div>
               </div>
             );
           })}
