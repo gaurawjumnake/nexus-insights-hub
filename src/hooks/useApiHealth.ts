@@ -6,7 +6,7 @@
  */
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getApiBaseUrl, API_BASE_URL_EVENT } from '@/config/api'
+import { buildApiUrl, API_BASE_URL_EVENT } from '@/config/api'
 
 export type ApiHealthStatus = 'connected' | 'empty' | 'offline'
 
@@ -19,7 +19,7 @@ async function probe(): Promise<ApiHealthResult> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    const res = await fetch(`${getApiBaseUrl()}/kpis`, {
+    const res = await fetch(buildApiUrl('/kpis'), {
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
     })

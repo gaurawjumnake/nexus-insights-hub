@@ -23,7 +23,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { normaliseKpiList, type NormalisedKpi, type RawKpi } from '@/lib/normaliseKpi'
-import { getApiBaseUrl } from '@/config/api'
+import { buildApiUrl } from '@/config/api'
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -41,7 +41,7 @@ export const kpiKeys = {
 // ─── Fetcher ─────────────────────────────────────────────────────────────────
 
 async function fetchKpis(companyId: string, period: string): Promise<RawKpi[]> {
-  const url = `${getApiBaseUrl()}/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`
+  const url = buildApiUrl(`/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`)
   const res = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
   })

@@ -10,7 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { kpiKeys } from "@/hooks/useKpis";
-import { getApiBaseUrl } from "@/config/api";
+import { buildApiUrl, getApiBaseUrl } from "@/config/api";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -54,7 +54,7 @@ function UploadPage() {
     fd.append("period", period);
 
     try {
-      const res = await fetch(`${getApiBaseUrl()}/documents/upload`, {
+      const res = await fetch(buildApiUrl("/documents/upload"), {
         method: "POST",
         body: fd,
       });
@@ -87,7 +87,7 @@ function UploadPage() {
     setCalculating(true);
     setCalcMessage(null);
     try {
-      const res = await fetch(`${getApiBaseUrl()}/kpis/calculate`, {
+      const res = await fetch(buildApiUrl("/kpis/calculate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ company_id: companyId, period }),
