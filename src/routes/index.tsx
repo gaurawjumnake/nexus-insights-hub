@@ -718,6 +718,13 @@ const SUMMARY_DEFS: { label: string; kpiId: string; icon: typeof Globe }[] = [
 function NexusDashboard() {
   const [persona, setPersona] = useState<Persona>("cxo");
   const [subTab, setSubTab] = useState<SubTab>("all");
+  const [contextId, setContextId] = useState<string>("all");
+
+  const portfolio = usePortfolioKpis();
+  const activeKpis = useMemo(
+    () => selectContextKpis(portfolio, contextId),
+    [portfolio, contextId],
+  );
 
   const sections = TILES[persona];
   const visibleSections = sections
