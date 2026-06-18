@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ApiHealthIndicator } from "@/components/ApiHealthIndicator";
+import { BackendConfigPanel } from "@/components/BackendConfigPanel";
 
 type NavItem = {
   to: string;
@@ -84,6 +85,7 @@ export function RightSidebar() {
         })}
       </nav>
 
+      {!collapsed && <BackendConfigPanel />}
       <ApiHealthIndicator collapsed={collapsed} />
       {!collapsed && (
         <div className="px-3 py-2 border-t border-slate-200 text-[10px] text-slate-400">
