@@ -1,22 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Activity,
   TrendingUp,
   TrendingDown,
-  DollarSign,
   Users,
   Zap,
   Download,
   Plus,
   Trash2,
-  ChevronDown,
   Globe,
   BarChart3,
   Info,
   ArrowRight,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePortfolioKpis, selectContextKpis } from "@/hooks/usePortfolioKpis";
+import { kpi as kpiOf } from "@/lib/normaliseKpi";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -703,19 +704,27 @@ const TILES: Record<Persona, { sectionTitle: string; tiles: Tile[] }[]> = {
   ],
 };
 
-// Top-level KPI summary strip
-const SUMMARY = [
-  { label: "AI Revenue", value: "$92.4M", delta: "+12.4%", icon: Globe },
-  { label: "EBITDA Uplift", value: "+10.4%", delta: "+3.2pp", icon: TrendingUp },
-  { label: "AI ROI", value: "3.9x", delta: "+0.4x", icon: BarChart3 },
-  { label: "Adoption Score", value: "73/100", delta: "+9pts", icon: Activity },
-  { label: "Active AI Users", value: "2,772", delta: "+418", icon: Users },
-  { label: "Prod Projects", value: "53", delta: "+12", icon: Zap },
+// Summary KPI strip — bound to live API data.
+// Each entry maps to a kpi_id in the normalised KPI map.
+const SUMMARY_DEFS: { label: string; kpiId: string; icon: typeof Globe }[] = [
+  { label: "AI Revenue", kpiId: "ai_revenue", icon: Globe },
+  { label: "EBITDA Uplift", kpiId: "ebitda_uplift", icon: TrendingUp },
+  { label: "AI ROI", kpiId: "ai_roi", icon: BarChart3 },
+  { label: "Adoption Score", kpiId: "portfolio_ai_adoption_score", icon: Activity },
+  { label: "Active AI Users", kpiId: "active_ai_users", icon: Users },
+  { label: "Prod Projects", kpiId: "projects_in_production", icon: Zap },
 ];
 
 function NexusDashboard() {
   const [persona, setPersona] = useState<Persona>("cxo");
   const [subTab, setSubTab] = useState<SubTab>("all");
+  const [contextId, setContextId] = useState<string>("all");
+
+  const portfolio = usePortfolioKpis();
+  const activeKpis = useMemo(
+    () => selectContextKpis(portfolio, contextId),
+    [portfolio, contextId],
+  );
 
   const sections = TILES[persona];
   const visibleSections = sections
@@ -741,12 +750,28 @@ function NexusDashboard() {
               <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                 Context
               </span>
-              <select className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500">
-                <option value="all">◈ All Portfolio (Fortive Group)</option>
-                <option value="gordion">Gordion · Industrial IoT · Growth</option>
-                <option value="provation">Provation · Healthcare IT · Series C</option>
-                <option value="fluke">Fluke · Test &amp; Measurement · Mature</option>
+              <select
+                value={contextId}
+                onChange={(e) => setContextId(e.target.value)}
+                disabled={portfolio.isLoadingCompanies}
+                className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60"
+              >
+                <option value="all">◈ All Portfolio</option>
+                {portfolio.companies.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                    {c.sector ? ` · ${c.sector}` : ""}
+                  </option>
+                ))}
               </select>
+              {portfolio.error && (
+                <span
+                  className="flex items-center gap-1 text-[11px] text-rose-600"
+                  title={portfolio.error.message}
+                >
+                  <AlertCircle className="h-3.5 w-3.5" /> KPI API offline
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -764,10 +789,12 @@ function NexusDashboard() {
       </header>
 
       <main className="mx-auto max-w-[1400px] px-6 py-6">
-        {/* Summary KPIs */}
+        {/* Summary KPIs — live data */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {SUMMARY.map((k) => {
+          {SUMMARY_DEFS.map((k) => {
             const Icon = k.icon;
+            const loading = portfolio.isLoadingKpis;
+            const display = kpiOf(activeKpis, k.kpiId, "—");
             return (
               <div
                 key={k.label}
@@ -779,8 +806,16 @@ function NexusDashboard() {
                   </div>
                   <Icon className="h-3.5 w-3.5 text-slate-400" />
                 </div>
-                <div className="mt-2 text-2xl font-semibold tracking-tight">{k.value}</div>
-                <div className="mt-1 text-[11px] font-medium text-emerald-600">{k.delta}</div>
+                <div className="mt-2 text-2xl font-semibold tracking-tight">
+                  {loading ? (
+                    <span className="inline-block h-6 w-20 animate-pulse rounded bg-slate-200" />
+                  ) : (
+                    display
+                  )}
+                </div>
+                <div className="mt-1 text-[11px] font-medium text-slate-400">
+                  {contextId === "all" ? "Portfolio rollup" : contextId}
+                </div>
               </div>
             );
           })}
