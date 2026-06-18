@@ -704,14 +704,15 @@ const TILES: Record<Persona, { sectionTitle: string; tiles: Tile[] }[]> = {
   ],
 };
 
-// Top-level KPI summary strip
-const SUMMARY = [
-  { label: "AI Revenue", value: "$92.4M", delta: "+12.4%", icon: Globe },
-  { label: "EBITDA Uplift", value: "+10.4%", delta: "+3.2pp", icon: TrendingUp },
-  { label: "AI ROI", value: "3.9x", delta: "+0.4x", icon: BarChart3 },
-  { label: "Adoption Score", value: "73/100", delta: "+9pts", icon: Activity },
-  { label: "Active AI Users", value: "2,772", delta: "+418", icon: Users },
-  { label: "Prod Projects", value: "53", delta: "+12", icon: Zap },
+// Summary KPI strip — bound to live API data.
+// Each entry maps to a kpi_id in the normalised KPI map.
+const SUMMARY_DEFS: { label: string; kpiId: string; icon: typeof Globe }[] = [
+  { label: "AI Revenue", kpiId: "ai_revenue", icon: Globe },
+  { label: "EBITDA Uplift", kpiId: "ebitda_uplift", icon: TrendingUp },
+  { label: "AI ROI", kpiId: "ai_roi", icon: BarChart3 },
+  { label: "Adoption Score", kpiId: "portfolio_ai_adoption_score", icon: Activity },
+  { label: "Active AI Users", kpiId: "active_ai_users", icon: Users },
+  { label: "Prod Projects", kpiId: "projects_in_production", icon: Zap },
 ];
 
 function NexusDashboard() {
