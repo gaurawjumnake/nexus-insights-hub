@@ -23,11 +23,9 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { normaliseKpiList, type NormalisedKpi, type RawKpi } from '@/lib/normaliseKpi'
+import { getApiBaseUrl } from '@/config/api'
 
 // ─── Config ──────────────────────────────────────────────────────────────────
-
-/** Base URL — set via env var so it works in dev + prod without code changes */
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 
 /** Cache stays fresh for 2 minutes; background refetch after that */
 const STALE_TIME = 2 * 60 * 1000
@@ -43,7 +41,7 @@ export const kpiKeys = {
 // ─── Fetcher ─────────────────────────────────────────────────────────────────
 
 async function fetchKpis(companyId: string, period: string): Promise<RawKpi[]> {
-  const url = `${API_BASE}/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`
+  const url = `${getApiBaseUrl()}/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`
   const res = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
   })

@@ -10,6 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { kpiKeys } from "@/hooks/useKpis";
+import { getApiBaseUrl } from "@/config/api";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -20,8 +21,6 @@ export const Route = createFileRoute("/upload")({
   }),
   component: UploadPage,
 });
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 type UploadedDoc = {
   id: string;
@@ -55,7 +54,7 @@ function UploadPage() {
     fd.append("period", period);
 
     try {
-      const res = await fetch(`${API_BASE}/documents/upload`, {
+      const res = await fetch(`${getApiBaseUrl()}/documents/upload`, {
         method: "POST",
         body: fd,
       });
@@ -88,7 +87,7 @@ function UploadPage() {
     setCalculating(true);
     setCalcMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/kpis/calculate`, {
+      const res = await fetch(`${getApiBaseUrl()}/kpis/calculate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ company_id: companyId, period }),
@@ -258,7 +257,7 @@ function UploadPage() {
         </div>
 
         <div className="mt-6 text-[11px] text-slate-400">
-          API: <span className="font-mono">{API_BASE}</span>
+          API: <span className="font-mono">{getApiBaseUrl()}</span>
         </div>
       </div>
     </div>

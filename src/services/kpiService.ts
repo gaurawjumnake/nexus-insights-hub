@@ -4,9 +4,9 @@
  * All endpoints are configurable via VITE_API_BASE_URL.
  */
 import type { RawKpi } from '@/lib/normaliseKpi'
+import { getApiBaseUrl } from '@/config/api'
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
+const API_BASE = () => getApiBaseUrl()
 
 /** Companies known to the demo portfolio. Used as a fallback when
  *  the backend doesn't expose a /companies index. */
@@ -31,7 +31,7 @@ function pretty(id: string) {
 /** Try GET /companies; if backend doesn't ship it, fall back to known list. */
 export async function getCompanies(): Promise<Company[]> {
   try {
-    const res = await fetch(`${API_BASE}/companies`, {
+    const res = await fetch(`${API_BASE()}/companies`, {
       headers: { 'Content-Type': 'application/json' },
     })
     if (!res.ok) throw new Error(`status ${res.status}`)
@@ -56,7 +56,7 @@ export async function getCompanyKPIs(
   companyId: string,
   period: string = DEFAULT_PERIOD,
 ): Promise<RawKpi[]> {
-  const url = `${API_BASE}/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`
+  const url = `${API_BASE()}/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`
   const res = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
   })
