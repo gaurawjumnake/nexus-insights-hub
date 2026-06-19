@@ -38,15 +38,31 @@ import {
 } from "recharts";
 import { COLORS, GlassPanel, KpiCard, Pill } from "@/components/workforce/ui";
 import { useWorkforce } from "@/lib/workforce-context";
+<<<<<<< HEAD
 import { useKpis } from "@/hooks/useKpis";
 import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
 import { DEFAULT_PERIOD } from "@/services/kpiService";
+=======
+import { selectContextKpis, usePortfolioKpis } from "@/hooks/usePortfolioKpis";
+>>>>>>> f9497d158c145f022eaa059f73ed7dd26ce57922
 
 export const Route = createFileRoute("/workforce/business")({
   component: BusinessPersonaView,
 });
 
+<<<<<<< HEAD
 // ---------- Section 1: Executive KPIs (wired to real data below) ----------
+=======
+// ---------- Section 1: Executive KPIs (live from API) ----------
+const EXEC_KPI_DEFS: { id: string; title: string; icon: React.ReactNode; accent: string }[] = [
+  { id: "ai_revenue", title: "AI Revenue", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.teal },
+  { id: "cost_savings", title: "Cost Savings", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.green },
+  { id: "ebitda_uplift", title: "EBITDA Uplift", icon: <Percent className="w-4 h-4" />, accent: COLORS.indigo },
+  { id: "ai_roi", title: "AI ROI", icon: <Target className="w-4 h-4" />, accent: COLORS.violet },
+  { id: "payback_period", title: "Payback Period", icon: <Clock className="w-4 h-4" />, accent: COLORS.amber },
+  { id: "pipeline_influenced_revenue", title: "Pipeline Influenced Revenue", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.blue },
+];
+>>>>>>> f9497d158c145f022eaa059f73ed7dd26ce57922
 
 // ---------- Section 2: Revenue ----------
 const REV_KPIS = [
@@ -270,6 +286,7 @@ function useActiveKpis() {
 }
 
 function Section1ExecKPIs() {
+<<<<<<< HEAD
   const { kpis, isLoading } = useActiveKpis();
   const cards = [
     { id: "ai_revenue", title: "AI Attributed Revenue", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.teal },
@@ -279,10 +296,16 @@ function Section1ExecKPIs() {
     { id: "payback_period", title: "Payback Period", icon: <Clock className="w-4 h-4" />, accent: COLORS.amber },
     { id: "pipeline_influenced_revenue", title: "Pipeline Influenced Revenue", icon: <Layers className="w-4 h-4" />, accent: COLORS.blue },
   ];
+=======
+  const { company, period } = useWorkforce();
+  const portfolio = usePortfolioKpis(period);
+  const kpis = selectContextKpis(portfolio, company);
+>>>>>>> f9497d158c145f022eaa059f73ed7dd26ce57922
   return (
     <section>
       <SectionHeader eyebrow="Section 1" title="Executive KPI Summary" />
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+<<<<<<< HEAD
         {cards.map((c) => (
           <KpiCard
             key={c.id}
@@ -291,6 +314,15 @@ function Section1ExecKPIs() {
             accent={c.accent}
             value={isLoading ? "…" : kpis[c.id]?.display ?? "No data"}
             footer={isLoading ? undefined : kpis[c.id] ? `Coverage ${Math.round((kpis[c.id].coverage ?? 0) * 100)}%` : "Not yet calculated"}
+=======
+        {EXEC_KPI_DEFS.map((k) => (
+          <KpiCard
+            key={k.id}
+            title={k.title}
+            value={kpis[k.id]?.display ?? "No data"}
+            icon={k.icon}
+            accent={k.accent}
+>>>>>>> f9497d158c145f022eaa059f73ed7dd26ce57922
           />
         ))}
       </div>
