@@ -1,6 +1,6 @@
 /**
  * useApiHealth.ts
- * Lightweight backend reachability check against GET /kpis.
+ * Lightweight backend reachability check against GET /kpis/.
  * Cached for 60s, retries failed requests once.
  * Re-runs when the API base URL changes (sidebar config).
  */
@@ -19,7 +19,9 @@ async function probe(): Promise<ApiHealthResult> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    const res = await fetch(buildApiUrl('/kpis'), {
+    // Trailing slash matches this backend's real route (GET /kpis/) and
+    // avoids an extra 307-redirect round trip from the no-slash variant.
+    const res = await fetch(buildApiUrl('/kpis/'), {
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
     })
@@ -30,11 +32,14 @@ async function probe(): Promise<ApiHealthResult> {
       return { status: 'empty', checkedAt: Date.now() }
     }
     const data = await res.json().catch(() => null)
+    const obj = data as { items?: unknown[]; kpis?: unknown[] } | null
     const list: unknown[] = Array.isArray(data)
       ? data
-      : Array.isArray((data as { items?: unknown[] })?.items)
-        ? (data as { items: unknown[] }).items
-        : []
+      : Array.isArray(obj?.kpis)
+        ? obj.kpis
+        : Array.isArray(obj?.items)
+          ? obj.items
+          : []
     return {
       status: list.length > 0 ? 'connected' : 'empty',
       checkedAt: Date.now(),

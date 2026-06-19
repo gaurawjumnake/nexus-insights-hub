@@ -53,10 +53,11 @@ async function fetchKpis(companyId: string, period: string): Promise<RawKpi[]> {
 
   const data = await res.json()
 
-  // API returns either a plain array or { items: [...] } — handle both
+  // API returns either a plain array, { kpis: [...] }, or { items: [...] } — handle all
   if (Array.isArray(data)) return data
+  if (Array.isArray(data?.kpis)) return data.kpis
   if (Array.isArray(data?.items)) return data.items
-  throw new Error('Unexpected KPI response shape — expected array or { items: [] }')
+  throw new Error('Unexpected KPI response shape — expected array, { kpis: [] }, or { items: [] }')
 }
 
 // ─── Return type ─────────────────────────────────────────────────────────────

@@ -2,17 +2,16 @@
  * kpiService.ts
  * Thin HTTP layer for the KPI pipeline.
  * All endpoints are configurable via VITE_API_BASE_URL.
+ *
+ * IMPORTANT: this backend has no /companies endpoint (confirmed via its
+ * Swagger schema — only /kpis/, /kpis/{company_id}/{period}, /kpis/extract,
+ * /kpis/calculate, /kpis/insights, /documents/*, /health exist). The only
+ * reliable way to discover which companies/periods exist is to call
+ * GET /kpis/ (returns { kpis: RawKpi[] } for every company) and group by
+ * company_id ourselves. We do that instead of guessing company names.
  */
 import type { RawKpi } from '@/lib/normaliseKpi'
 import { buildApiUrl } from '@/config/api'
-
-/** Companies known to the demo portfolio. Used as a fallback when
- *  the backend doesn't expose a /companies index. */
-export const FALLBACK_COMPANIES = [
-  { id: 'gordian', label: 'Gordian', sector: 'Construction Cost Data' },
-  { id: 'provation', label: 'Provation', sector: 'Healthcare SaaS' },
-  { id: 'fluke', label: 'Fluke', sector: 'Industrial Test & Measure' },
-]
 
 export const DEFAULT_PERIOD = '2025-2026'
 
@@ -23,29 +22,69 @@ export interface Company {
 }
 
 function pretty(id: string) {
-  return id.charAt(0).toUpperCase() + id.slice(1)
+  return id
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
 }
 
-/** Try GET /companies; if backend doesn't ship it, fall back to known list. */
+/** Unwrap the various shapes a KPI endpoint on this backend can return. */
+function extractKpiArray(data: unknown): RawKpi[] {
+  if (Array.isArray(data)) return data as RawKpi[]
+  const obj = data as Record<string, unknown> | null | undefined
+  if (Array.isArray(obj?.kpis)) return obj.kpis as RawKpi[]
+  if (Array.isArray(obj?.items)) return obj.items as RawKpi[]
+  return []
+}
+
+/**
+ * GET /kpis/ → { kpis: RawKpi[] } for every company/period this backend
+ * currently has data for. This is the single source of truth for both the
+ * company list and (optionally) the KPI values themselves.
+ */
+export async function getAllKpis(): Promise<RawKpi[]> {
+  const res = await fetch(buildApiUrl('/kpis/'), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`KPI list fetch failed [${res.status}]: ${body}`)
+  }
+  const data = await res.json()
+  return extractKpiArray(data)
+}
+
+/**
+ * Derives the company list by calling GET /kpis/ and grouping by company_id.
+ * There is no dedicated /companies endpoint on this backend.
+ */
 export async function getCompanies(): Promise<Company[]> {
   try {
-    const res = await fetch(buildApiUrl('/companies'), {
-      headers: { 'Content-Type': 'application/json' },
-    })
-    if (!res.ok) throw new Error(`status ${res.status}`)
-    const data = await res.json()
-    const list: unknown[] = Array.isArray(data) ? data : data?.items ?? []
-    if (!list.length) return FALLBACK_COMPANIES
-    return list.map((item) => {
-      if (typeof item === 'string') return { id: item, label: pretty(item) }
-      const obj = item as Record<string, unknown>
-      const id = String(obj.id ?? obj.company_id ?? obj.name ?? '')
-      const label = String(obj.label ?? obj.display_name ?? obj.name ?? pretty(id))
-      const sector = obj.sector ? String(obj.sector) : undefined
-      return { id, label, sector }
-    }).filter((c) => c.id)
+    const all = await getAllKpis()
+    const ids = Array.from(new Set(all.map((r) => r.company_id).filter(Boolean)))
+    return ids.map((id) => ({ id, label: pretty(id) })).sort((a, b) => a.label.localeCompare(b.label))
   } catch {
-    return FALLBACK_COMPANIES
+    return []
+  }
+}
+
+/**
+ * Derives the most recent / most common period present in the data, so
+ * callers don't have to hardcode "2025-2026" if the backend moves on.
+ * Falls back to DEFAULT_PERIOD if nothing is found.
+ */
+export async function getLatestPeriod(): Promise<string> {
+  try {
+    const all = await getAllKpis()
+    const periods = all.map((r) => r.period).filter(Boolean)
+    if (!periods.length) return DEFAULT_PERIOD
+    // Most frequent period wins (handles mixed-period datasets gracefully).
+    const counts = new Map<string, number>()
+    for (const p of periods) counts.set(p, (counts.get(p) ?? 0) + 1)
+    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0]
+  } catch {
+    return DEFAULT_PERIOD
   }
 }
 
@@ -63,9 +102,7 @@ export async function getCompanyKPIs(
     throw new Error(`KPI fetch failed [${res.status}]: ${body}`)
   }
   const data = await res.json()
-  if (Array.isArray(data)) return data
-  if (Array.isArray(data?.items)) return data.items
-  return []
+  return extractKpiArray(data)
 }
 
 /** Fetches all companies in parallel. */
