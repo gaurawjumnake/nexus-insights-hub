@@ -715,6 +715,35 @@ const SUMMARY_DEFS: { label: string; kpiId: string; icon: typeof Globe }[] = [
   { label: "Prod Projects", kpiId: "projects_in_production", icon: Zap },
 ];
 
+// Map persona-tile titles to backend KPI ids.
+// When a live value exists it overrides tile.value; otherwise the existing
+// mock value is kept as a graceful fallback. Missing-but-expected => "-".
+const TILE_TITLE_TO_KPI: Record<string, string> = {
+  "AI-Attributed Revenue": "ai_revenue",
+  "Revenue Uplift (AI-Attributed)": "ai_revenue",
+  "AI ROI (Portfolio-wide)": "ai_roi",
+  "Total AI Spend vs Budget": "total_ai_spend",
+  "AI EBITDA Uplift (pp)": "ebitda_uplift",
+  "EBITDA Margin Impact": "ebitda_uplift",
+  "Cost per Outcome (Unit Economics)": "cost_per_outcome",
+  "Portfolio AI Adoption Score": "portfolio_ai_adoption_score",
+  "AI Projects: Prod vs PoC": "projects_in_production",
+  "AI Maturity Score (Composite)": "ai_maturity_score",
+  "AI Governance Score": "ai_governance_score",
+  "Policy Compliance Rate": "policy_compliance_rate",
+  "Aggregate Cost Savings": "cost_savings",
+  "Human Productivity Gains": "productivity_gain",
+  "AI Policy Compliance": "policy_compliance_rate",
+  "DAU / MAU Intensity": "active_ai_users",
+  "Production Velocity": "projects_in_production",
+  "Human Review Coverage": "human_review_coverage",
+  "Industry Benchmark": "industry_benchmark_ratio",
+  "Active AI Users": "active_ai_users",
+  "% AI in Production": "percent_ai_in_production",
+  "Availability (Uptime)": "availability_uptime",
+  "Forecasted Spend (Q4)": "forecasted_ai_spend",
+};
+
 function NexusDashboard() {
   const [persona, setPersona] = useState<Persona>("cxo");
   const [subTab, setSubTab] = useState<SubTab>("all");
@@ -903,7 +932,7 @@ function NexusDashboard() {
                 </h2>
                 <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {section.tiles.map((tile, i) => (
-                    <TileCard key={`${tile.title}-${i}`} tile={tile} />
+                    <TileCard key={`${tile.title}-${i}`} tile={tile} liveKpis={activeKpis} />
                   ))}
                 </div>
               </section>
@@ -923,7 +952,11 @@ function NexusDashboard() {
   );
 }
 
-function TileCard({ tile }: { tile: Tile }) {
+function TileCard({ tile, liveKpis }: { tile: Tile; liveKpis?: Record<string, import("@/lib/normaliseKpi").NormalisedKpi> }) {
+  const kpiId = TILE_TITLE_TO_KPI[tile.title];
+  const live = kpiId && liveKpis ? liveKpis[kpiId] : undefined;
+  // Prefer live API value; if mapped but missing show "-"; otherwise mock fallback.
+  const displayValue = live?.display ?? (kpiId ? "-" : tile.value);
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className={cn("h-[3px] w-full", accentBar[tile.accent])} />
@@ -956,7 +989,7 @@ function TileCard({ tile }: { tile: Tile }) {
 
         <div className="mt-3 text-sm font-medium text-slate-700">{tile.title}</div>
         <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
-          {tile.value}
+          {displayValue}
         </div>
 
         {tile.desc && (
