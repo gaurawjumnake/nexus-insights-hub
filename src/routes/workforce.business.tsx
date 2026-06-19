@@ -38,19 +38,20 @@ import {
 } from "recharts";
 import { COLORS, GlassPanel, KpiCard, Pill } from "@/components/workforce/ui";
 import { useWorkforce } from "@/lib/workforce-context";
+import { selectContextKpis, usePortfolioKpis } from "@/hooks/usePortfolioKpis";
 
 export const Route = createFileRoute("/workforce/business")({
   component: BusinessPersonaView,
 });
 
-// ---------- Section 1: Executive KPIs ----------
-const EXEC_KPIS = [
-  { title: "AI Attributed Revenue", value: "$22.7M", trend: "+28% YoY", footer: "Top Quartile · Bench $14.2M", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.teal },
-  { title: "Revenue Uplift %", value: "6.4%", trend: "+2.1 pts", footer: "Top Quartile · Bench 3.8%", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.green },
-  { title: "EBITDA Impact", value: "$14.3M", trend: "+34% YoY", footer: "Top Quartile · Bench $8.9M", icon: <Percent className="w-4 h-4" />, accent: COLORS.indigo },
-  { title: "AI ROI", value: "4.2x", trend: "+0.9x", footer: "Top Quartile · Bench 2.7x", icon: <Target className="w-4 h-4" />, accent: COLORS.violet },
-  { title: "Payback Period", value: "9.2 mo", trend: "-3.4 mo", footer: "Top Quartile · Bench 14 mo", icon: <Clock className="w-4 h-4" />, accent: COLORS.amber, trendDirection: "up" as const },
-  { title: "Active AI Use Cases", value: "47", trend: "+12 QoQ", footer: "Median · Bench 52", icon: <Layers className="w-4 h-4" />, accent: COLORS.blue },
+// ---------- Section 1: Executive KPIs (live from API) ----------
+const EXEC_KPI_DEFS: { id: string; title: string; icon: React.ReactNode; accent: string }[] = [
+  { id: "ai_revenue", title: "AI Revenue", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.teal },
+  { id: "cost_savings", title: "Cost Savings", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.green },
+  { id: "ebitda_uplift", title: "EBITDA Uplift", icon: <Percent className="w-4 h-4" />, accent: COLORS.indigo },
+  { id: "ai_roi", title: "AI ROI", icon: <Target className="w-4 h-4" />, accent: COLORS.violet },
+  { id: "payback_period", title: "Payback Period", icon: <Clock className="w-4 h-4" />, accent: COLORS.amber },
+  { id: "pipeline_influenced_revenue", title: "Pipeline Influenced Revenue", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.blue },
 ];
 
 // ---------- Section 2: Revenue ----------
@@ -264,12 +265,21 @@ function BusinessPersonaView() {
 
 // ---------------- Section 1 ----------------
 function Section1ExecKPIs() {
+  const { company, period } = useWorkforce();
+  const portfolio = usePortfolioKpis(period);
+  const kpis = selectContextKpis(portfolio, company);
   return (
     <section>
       <SectionHeader eyebrow="Section 1" title="Executive KPI Summary" />
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {EXEC_KPIS.map((k) => (
-          <KpiCard key={k.title} {...k} />
+        {EXEC_KPI_DEFS.map((k) => (
+          <KpiCard
+            key={k.id}
+            title={k.title}
+            value={kpis[k.id]?.display ?? "No data"}
+            icon={k.icon}
+            accent={k.accent}
+          />
         ))}
       </div>
     </section>
