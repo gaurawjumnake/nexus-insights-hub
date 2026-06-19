@@ -932,7 +932,7 @@ function NexusDashboard() {
                 </h2>
                 <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {section.tiles.map((tile, i) => (
-                    <TileCard key={`${tile.title}-${i}`} tile={tile} />
+                    <TileCard key={`${tile.title}-${i}`} tile={tile} liveKpis={activeKpis} />
                   ))}
                 </div>
               </section>
