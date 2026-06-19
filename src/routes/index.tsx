@@ -952,7 +952,11 @@ function NexusDashboard() {
   );
 }
 
-function TileCard({ tile }: { tile: Tile }) {
+function TileCard({ tile, liveKpis }: { tile: Tile; liveKpis?: Record<string, import("@/lib/normaliseKpi").NormalisedKpi> }) {
+  const kpiId = TILE_TITLE_TO_KPI[tile.title];
+  const live = kpiId && liveKpis ? liveKpis[kpiId] : undefined;
+  // Prefer live API value; if mapped but missing show "-"; otherwise mock fallback.
+  const displayValue = live?.display ?? (kpiId ? "-" : tile.value);
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className={cn("h-[3px] w-full", accentBar[tile.accent])} />
