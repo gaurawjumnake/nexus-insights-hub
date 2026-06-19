@@ -19,7 +19,7 @@ const LEGACY_STORAGE_KEY = 'nexus.apiBaseUrl'
 const DEFAULT_URL =
   (typeof import.meta !== 'undefined' &&
     (import.meta as ImportMeta).env?.VITE_API_BASE_URL) ||
-  'http://localhost:8000'
+  'http://localhost:8005'
 
 export const API_BASE_URL_EVENT = 'nexus:api-base-url-changed'
 

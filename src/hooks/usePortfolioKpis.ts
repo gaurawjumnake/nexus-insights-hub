@@ -6,21 +6,25 @@
  * - Loads /kpis/{company}/{period} for every company in parallel
  * - Exposes per-company maps + portfolio aggregate
  */
-import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query'
-import {
-  getCompanies,
-  getCompanyKPIs,
-  DEFAULT_PERIOD,
-  type Company,
-} from '@/services/kpiService'
-import { normaliseKpiList, type NormalisedKpi } from '@/lib/normaliseKpi'
+/**
+ * usePortfolioKpis.ts
+ *
+ * Single source of truth for the executive dashboard + compare screen.
+ * - Loads every KPI via GET /kpis/ (the only endpoint this backend exposes
+ *   for bulk reads) and derives the company list + period from that data —
+ *   there is no /companies endpoint, so we stop guessing company names.
+ * - Exposes per-company maps + portfolio aggregate.
+ */
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { getAllKpis, getCompanyKPIs, DEFAULT_PERIOD, type Company } from '@/services/kpiService'
+import { normaliseKpiList, type NormalisedKpi, type RawKpi } from '@/lib/normaliseKpi'
 import { aggregatePortfolio } from '@/utils/kpiAggregation'
 import { useMemo } from 'react'
 
 const STALE_TIME = 2 * 60 * 1000
 
 export const kpiKeys = {
-  companies: ['kpi-companies'] as const,
+  all: ['kpis-all'] as const,
   kpis: (companyId: string, period: string) =>
     ['kpis', companyId, period] as const,
 }
@@ -38,65 +42,78 @@ export interface UsePortfolioKpisResult {
   invalidate: () => Promise<void>
 }
 
-export function usePortfolioKpis(
-  period: string = DEFAULT_PERIOD,
-): UsePortfolioKpisResult {
+function pretty(id: string) {
+  return id
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
+}
+
+/**
+ * @param period Optional explicit period filter. When omitted, every period
+ * present in the backend's data is used (no hardcoded "2025-2026" guess).
+ */
+export function usePortfolioKpis(period?: string): UsePortfolioKpisResult {
   const queryClient = useQueryClient()
 
-  const companiesQuery = useQuery({
-    queryKey: kpiKeys.companies,
-    queryFn: getCompanies,
-    staleTime: 10 * 60 * 1000,
+  // GET /kpis/ once — this single call gives us every company, every period,
+  // every KPI. We derive companies + per-company maps from it locally instead
+  // of making a /companies call (doesn't exist) or N separate per-company
+  // requests with a possibly-wrong period.
+  const allKpisQuery = useQuery({
+    queryKey: kpiKeys.all,
+    queryFn: getAllKpis,
+    staleTime: STALE_TIME,
+    retry: 1,
   })
 
-  const companies = companiesQuery.data ?? []
+  const allKpis = allKpisQuery.data ?? []
 
-  const kpiQueries = useQueries({
-    queries: companies.map((c) => ({
-      queryKey: kpiKeys.kpis(c.id, period),
-      queryFn: () => getCompanyKPIs(c.id, period),
-      staleTime: STALE_TIME,
-      retry: 1,
-    })),
-  })
+  const filteredKpis = useMemo(() => {
+    if (!period) return allKpis
+    return allKpis.filter((r) => r.period === period)
+  }, [allKpis, period])
+
+  const companies = useMemo<Company[]>(() => {
+    const ids = Array.from(new Set(filteredKpis.map((r) => r.company_id).filter(Boolean)))
+    return ids
+      .map((id) => ({ id, label: pretty(id) }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  }, [filteredKpis])
+
+  const perCompanyRaw = useMemo(() => {
+    const out: Record<string, RawKpi[]> = {}
+    for (const row of filteredKpis) {
+      if (!row.company_id) continue
+      ;(out[row.company_id] ??= []).push(row)
+    }
+    return out
+  }, [filteredKpis])
 
   const perCompany = useMemo(() => {
     const out: Record<string, Record<string, NormalisedKpi>> = {}
-    companies.forEach((c, i) => {
-      const data = kpiQueries[i]?.data ?? []
-      out[c.id] = normaliseKpiList(data)
-    })
+    for (const c of companies) {
+      out[c.id] = normaliseKpiList(perCompanyRaw[c.id] ?? [])
+    }
     return out
-  }, [companies, kpiQueries])
+  }, [companies, perCompanyRaw])
 
-  const portfolio = useMemo(() => {
-    const raw: Record<string, ReturnType<typeof Object>> = {}
-    companies.forEach((c, i) => {
-      const data = kpiQueries[i]?.data ?? []
-      raw[c.id] = data as never
-    })
-    return aggregatePortfolio(raw as never, period)
-  }, [companies, kpiQueries, period])
-
-  const isLoadingKpis = kpiQueries.some((q) => q.isLoading)
-  const isFetching =
-    companiesQuery.isFetching || kpiQueries.some((q) => q.isFetching)
-  const firstErr =
-    (companiesQuery.error as Error | null) ??
-    (kpiQueries.find((q) => q.error)?.error as Error | null) ??
-    null
+  const portfolio = useMemo(
+    () => aggregatePortfolio(perCompanyRaw, period ?? DEFAULT_PERIOD),
+    [perCompanyRaw, period],
+  )
 
   const invalidate = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['kpis'] })
-    await queryClient.invalidateQueries({ queryKey: kpiKeys.companies })
+    await queryClient.invalidateQueries({ queryKey: kpiKeys.all })
   }
 
   return {
     companies,
-    isLoadingCompanies: companiesQuery.isLoading,
-    isLoadingKpis,
-    isFetching,
-    error: firstErr,
+    isLoadingCompanies: allKpisQuery.isLoading,
+    isLoadingKpis: allKpisQuery.isLoading,
+    isFetching: allKpisQuery.isFetching,
+    error: allKpisQuery.error as Error | null,
     perCompany,
     portfolio,
     invalidate,
@@ -111,3 +128,7 @@ export function selectContextKpis(
   if (contextId === 'all') return result.portfolio
   return result.perCompany[contextId] ?? {}
 }
+
+// Re-exported for callers that still want a single-company, single-period
+// fetch (e.g. a detail drilldown screen) without pulling the whole dataset.
+export { getCompanyKPIs }

@@ -5,6 +5,9 @@ import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
 import { kpi as kpiOf, kpiValue } from "@/lib/normaliseKpi";
 
 export const Route = createFileRoute("/compare")({
+  // See src/routes/index.tsx for why this route is client-only: the
+  // configurable API base URL lives in localStorage, which SSR can't see.
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Portfolio Comparison — Nexus" },

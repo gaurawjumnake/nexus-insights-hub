@@ -20,6 +20,12 @@ import { usePortfolioKpis, selectContextKpis } from "@/hooks/usePortfolioKpis";
 import { kpi as kpiOf } from "@/lib/normaliseKpi";
 
 export const Route = createFileRoute("/")({
+  // KPI data is fetched client-side and the backend base URL is configurable
+  // per-browser via localStorage (see src/config/api.ts + BackendConfigPanel).
+  // That config is invisible during SSR, so server-rendering this route would
+  // always hit the build-time default URL and ignore the user's saved setting.
+  // Disabling SSR here keeps the configured URL and the actual fetch in sync.
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Nexus — PE AI Observability Tower" },
@@ -717,22 +723,32 @@ const SUMMARY_DEFS: { label: string; kpiId: string; icon: typeof Globe }[] = [
 
 // Map persona-tile titles to backend KPI ids.
 // When a live value exists it overrides tile.value; otherwise the existing
-// mock value is kept as a graceful fallback. Missing-but-expected => "-".
+// mock value is kept as a clearly-labeled fallback (see TileCard "MOCK" badge).
+// Titles NOT in this map (e.g. "Top Performer Ranking", "Spend by Model Family",
+// "Portfolio Ranking") are intentionally left out — they're narrative/composite
+// breakdowns with no single matching backend kpi_id, not missed bindings.
 const TILE_TITLE_TO_KPI: Record<string, string> = {
   "AI-Attributed Revenue": "ai_revenue",
   "Revenue Uplift (AI-Attributed)": "ai_revenue",
   "AI ROI (Portfolio-wide)": "ai_roi",
   "Total AI Spend vs Budget": "total_ai_spend",
+  "Total AI Spend": "total_ai_spend",
   "AI EBITDA Uplift (pp)": "ebitda_uplift",
   "EBITDA Margin Impact": "ebitda_uplift",
   "Cost per Outcome (Unit Economics)": "cost_per_outcome",
+  "Cost per AI Outcome": "cost_per_outcome",
   "Portfolio AI Adoption Score": "portfolio_ai_adoption_score",
   "AI Projects: Prod vs PoC": "projects_in_production",
   "AI Maturity Score (Composite)": "ai_maturity_score",
+  "AI Maturity Score": "ai_maturity_score",
   "AI Governance Score": "ai_governance_score",
+  "Governance Score": "ai_governance_score",
   "Policy Compliance Rate": "policy_compliance_rate",
+  "Policy Compliance": "policy_compliance_rate",
   "Aggregate Cost Savings": "cost_savings",
+  "Cost Savings (OpEx)": "cost_savings",
   "Human Productivity Gains": "productivity_gain",
+  "Productivity Gains": "productivity_gain",
   "AI Policy Compliance": "policy_compliance_rate",
   "DAU / MAU Intensity": "active_ai_users",
   "Production Velocity": "projects_in_production",
@@ -741,7 +757,11 @@ const TILE_TITLE_TO_KPI: Record<string, string> = {
   "Active AI Users": "active_ai_users",
   "% AI in Production": "percent_ai_in_production",
   "Availability (Uptime)": "availability_uptime",
+  "System Availability": "availability_uptime",
   "Forecasted Spend (Q4)": "forecasted_ai_spend",
+  "Forecasted AI Spend": "forecasted_ai_spend",
+  "Budget Adherence": "budget_adherence",
+  "Error Rate": "error_rate",
 };
 
 function NexusDashboard() {
@@ -932,7 +952,12 @@ function NexusDashboard() {
                 </h2>
                 <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {section.tiles.map((tile, i) => (
-                    <TileCard key={`${tile.title}-${i}`} tile={tile} liveKpis={activeKpis} />
+                    <TileCard
+                      key={`${tile.title}-${i}`}
+                      tile={tile}
+                      liveKpis={activeKpis}
+                      isLoading={portfolio.isLoadingKpis}
+                    />
                   ))}
                 </div>
               </section>
@@ -943,8 +968,21 @@ function NexusDashboard() {
         <footer className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4 text-xs text-slate-500">
           <div>© 2026 Nexus Observatory · PE AI Observability Tower v4.2.0</div>
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            System Live: Real-time data sync active
+            <span
+              className={cn(
+                "h-2 w-2 rounded-full",
+                portfolio.error
+                  ? "bg-rose-500"
+                  : portfolio.isFetching
+                    ? "bg-amber-400 animate-pulse"
+                    : "bg-emerald-500",
+              )}
+            />
+            {portfolio.error
+              ? "Data sync failed — showing last known / sample values"
+              : portfolio.isFetching
+                ? "Syncing with KPI API…"
+                : "System Live: Real-time data sync active"}
           </div>
         </footer>
       </main>
@@ -952,11 +990,27 @@ function NexusDashboard() {
   );
 }
 
-function TileCard({ tile, liveKpis }: { tile: Tile; liveKpis?: Record<string, import("@/lib/normaliseKpi").NormalisedKpi> }) {
+function TileCard({
+  tile,
+  liveKpis,
+  isLoading,
+}: {
+  tile: Tile;
+  liveKpis?: Record<string, import("@/lib/normaliseKpi").NormalisedKpi>;
+  isLoading?: boolean;
+}) {
   const kpiId = TILE_TITLE_TO_KPI[tile.title];
   const live = kpiId && liveKpis ? liveKpis[kpiId] : undefined;
-  // Prefer live API value; if mapped but missing show "-"; otherwise mock fallback.
-  const displayValue = live?.display ?? (kpiId ? "-" : tile.value);
+  const hasLiveValue = Boolean(live && !live.isNull);
+
+  // Three states per tile:
+  //   1. Mapped to a real kpi_id and the API returned data  -> show it, no badge.
+  //   2. Mapped but still loading                            -> skeleton.
+  //   3. Mapped but API has no/null value, or never mapped   -> mock fallback + badge.
+  const showSkeleton = Boolean(kpiId) && isLoading && !hasLiveValue;
+  const displayValue = hasLiveValue ? live!.display : tile.value;
+  const isMock = !hasLiveValue;
+
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className={cn("h-[3px] w-full", accentBar[tile.accent])} />
@@ -970,26 +1024,44 @@ function TileCard({ tile, liveKpis }: { tile: Tile; liveKpis?: Record<string, im
           >
             {tile.tag}
           </span>
-          {tile.delta && (
-            <span
-              className={cn(
-                "flex items-center gap-1 text-xs font-semibold",
-                tile.deltaTone === "down" ? "text-rose-600" : "text-emerald-600",
-              )}
-            >
-              {tile.deltaTone === "down" ? (
-                <TrendingDown className="h-3 w-3" />
-              ) : (
-                <TrendingUp className="h-3 w-3" />
-              )}
-              {tile.delta}
-            </span>
-          )}
+          <div className="flex items-center gap-1.5">
+            {!showSkeleton && isMock && (
+              <span
+                className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-50"
+                title={
+                  kpiId
+                    ? `No live value yet for "${kpiId}" — showing sample data.`
+                    : "No backend KPI mapped to this tile yet — showing sample data."
+                }
+              >
+                Mock
+              </span>
+            )}
+            {tile.delta && (
+              <span
+                className={cn(
+                  "flex items-center gap-1 text-xs font-semibold",
+                  tile.deltaTone === "down" ? "text-rose-600" : "text-emerald-600",
+                )}
+              >
+                {tile.deltaTone === "down" ? (
+                  <TrendingDown className="h-3 w-3" />
+                ) : (
+                  <TrendingUp className="h-3 w-3" />
+                )}
+                {tile.delta}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="mt-3 text-sm font-medium text-slate-700">{tile.title}</div>
         <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
-          {displayValue}
+          {showSkeleton ? (
+            <span className="inline-block h-7 w-24 animate-pulse rounded bg-slate-200" />
+          ) : (
+            displayValue
+          )}
         </div>
 
         {tile.desc && (
