@@ -989,7 +989,7 @@ function TileCard({ tile, liveKpis }: { tile: Tile; liveKpis?: Record<string, im
 
         <div className="mt-3 text-sm font-medium text-slate-700">{tile.title}</div>
         <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
-          {tile.value}
+          {displayValue}
         </div>
 
         {tile.desc && (
