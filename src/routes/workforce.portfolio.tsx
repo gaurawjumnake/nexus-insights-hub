@@ -33,12 +33,15 @@ type Row = {
   ebitda: number;
 };
 
+// NOTE: employees/readiness/productivity/attrition/engagement/risk have no
+// backend source (this KPI system has no HR/workforce data) — these stay
+// illustrative. Only the company identities are real; adoption/ebitda are
+// loosely modeled on real portfolio_ai_adoption_score / ebitda_uplift scale.
 const ROWS: Row[] = [
-  { company: "Company A", employees: 6240, adoption: 58, readiness: 81, productivity: 18, attrition: 9.2, engagement: 82, risk: 28, ebitda: 6.4 },
-  { company: "Company B", employees: 5180, adoption: 68, readiness: 84, productivity: 23, attrition: 8.1, engagement: 85, risk: 22, ebitda: 7.9 },
-  { company: "Company C", employees: 4310, adoption: 49, readiness: 71, productivity: 14, attrition: 10.4, engagement: 76, risk: 35, ebitda: 4.8 },
-  { company: "Company D", employees: 5520, adoption: 41, readiness: 64, productivity: 9, attrition: 18.7, engagement: 68, risk: 62, ebitda: 2.1 },
-  { company: "Company E", employees: 3580, adoption: 32, readiness: 54, productivity: 6, attrition: 13.5, engagement: 71, risk: 48, ebitda: 1.6 },
+  { company: "Provation", employees: 6240, adoption: 58, readiness: 81, productivity: 18, attrition: 9.2, engagement: 82, risk: 28, ebitda: 6.4 },
+  { company: "Fluke", employees: 5180, adoption: 68, readiness: 84, productivity: 23, attrition: 8.1, engagement: 85, risk: 22, ebitda: 7.9 },
+  { company: "Gordian", employees: 4310, adoption: 49, readiness: 71, productivity: 14, attrition: 10.4, engagement: 76, risk: 35, ebitda: 4.8 },
+  { company: "Novamind", employees: 5520, adoption: 41, readiness: 64, productivity: 9, attrition: 18.7, engagement: 68, risk: 62, ebitda: 2.1 },
 ];
 
 const COLUMNS: { key: keyof Row; label: string; fmt?: (v: number) => string }[] = [

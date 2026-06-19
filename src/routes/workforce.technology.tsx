@@ -36,20 +36,13 @@ import {
 } from "recharts";
 import { COLORS, GlassPanel, KpiCard, Pill } from "@/components/workforce/ui";
 import { useWorkforce } from "@/lib/workforce-context";
+import { useKpis } from "@/hooks/useKpis";
+import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
+import { DEFAULT_PERIOD } from "@/services/kpiService";
 
 export const Route = createFileRoute("/workforce/technology")({
   component: TechnologyPersonaView,
 });
-
-// ============ Section 1 - Executive Tech KPIs ============
-const EXEC_KPIS = [
-  { title: "Platform Availability", value: "99.94%", trend: "+0.12%", footer: "Top Quartile · Bench 99.85%", icon: <Activity className="w-4 h-4" />, accent: COLORS.green },
-  { title: "AI Apps in Production", value: "47", trend: "+9 QoQ", footer: "Median · Peers 38", icon: <Boxes className="w-4 h-4" />, accent: COLORS.indigo },
-  { title: "Monthly AI Spend", value: "$1.42M", trend: "+11% MoM", footer: "Forecast $1.58M", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.amber, trendDirection: "down" as const },
-  { title: "Average Latency", value: "412 ms", trend: "-38 ms", footer: "SLO 600 ms", icon: <Gauge className="w-4 h-4" />, accent: COLORS.teal },
-  { title: "Governance Score", value: "82/100", trend: "+6 pts", footer: "Top Quartile · Bench 74", icon: <ShieldCheck className="w-4 h-4" />, accent: COLORS.violet },
-  { title: "AI Incidents (30d)", value: "3", trend: "-4", footer: "Critical 0 · High 1", icon: <AlertTriangle className="w-4 h-4" />, accent: COLORS.red, trendDirection: "down" as const },
-];
 
 // ============ Section 2 - Platform Health ============
 const PLATFORM_KPIS = [
@@ -73,8 +66,8 @@ const PLATFORM_TREND = [
 const PORTFOLIO_HEALTH = [
   { company: "Provation", avail: 99.97, latency: 380, error: 0.18, status: "green" },
   { company: "Fluke", avail: 99.92, latency: 470, error: 0.41, status: "green" },
-  { company: "Aldevron", avail: 99.86, latency: 540, error: 0.62, status: "amber" },
-  { company: "Gordon", avail: 99.74, latency: 690, error: 1.12, status: "amber" },
+  { company: "Novamind", avail: 99.86, latency: 540, error: 0.62, status: "amber" },
+  { company: "Gordian", avail: 99.74, latency: 690, error: 1.12, status: "amber" },
   { company: "Catalent", avail: 99.41, latency: 920, error: 2.34, status: "red" },
 ];
 
@@ -121,8 +114,8 @@ const LIFECYCLE = [
 const APPS_BY_COMPANY = [
   { company: "Provation", apps: 28 },
   { company: "Fluke", apps: 22 },
-  { company: "Aldevron", apps: 19 },
-  { company: "Gordon", apps: 16 },
+  { company: "Novamind", apps: 19 },
+  { company: "Gordian", apps: 16 },
   { company: "Catalent", apps: 14 },
   { company: "HQ Platform", apps: 13 },
 ];
@@ -144,12 +137,12 @@ const AGENT_TREND = [
 
 const APP_INVENTORY = [
   { app: "Sales Copilot", company: "Provation", owner: "M. Chen", stage: "Production", users: "1.2k", cost: "$48k/mo", roi: "4.3x", health: 94 },
-  { app: "Support Agent", company: "Aldevron", owner: "R. Patel", stage: "Production", users: "640", cost: "$31k/mo", roi: "3.8x", health: 91 },
+  { app: "Support Agent", company: "Novamind", owner: "R. Patel", stage: "Production", users: "640", cost: "$31k/mo", roi: "3.8x", health: 91 },
   { app: "Proposal Studio", company: "Fluke", owner: "J. Kim", stage: "Production", users: "210", cost: "$22k/mo", roi: "3.1x", health: 88 },
   { app: "Finance Close Bot", company: "Catalent", owner: "S. Ali", stage: "UAT", users: "84", cost: "$14k/mo", roi: "2.6x", health: 76 },
   { app: "Knowledge Search", company: "Portfolio", owner: "L. Ortiz", stage: "Production", users: "3.1k", cost: "$39k/mo", roi: "5.6x", health: 96 },
-  { app: "Content Studio", company: "Gordon", owner: "T. Yamada", stage: "Pilot", users: "46", cost: "$11k/mo", roi: "—", health: 62 },
-  { app: "Procurement Agent", company: "Aldevron", owner: "P. Singh", stage: "Pilot", users: "32", cost: "$9k/mo", roi: "—", health: 58 },
+  { app: "Content Studio", company: "Gordian", owner: "T. Yamada", stage: "Pilot", users: "46", cost: "$11k/mo", roi: "—", health: 62 },
+  { app: "Procurement Agent", company: "Novamind", owner: "P. Singh", stage: "Pilot", users: "32", cost: "$9k/mo", roi: "—", health: 58 },
 ];
 
 // ============ Section 5 - Reliability ============
@@ -178,10 +171,10 @@ const RELIABILITY_RANK = [
 
 const INCIDENTS = [
   { id: "INC-2418", severity: "High", app: "Finance Close Bot", company: "Catalent", cause: "Model timeout cascade", mttr: "1h 12m" },
-  { id: "INC-2412", severity: "Medium", app: "Content Studio", company: "Gordon", cause: "Quota throttling", mttr: "38m" },
-  { id: "INC-2407", severity: "Medium", app: "Procurement Agent", company: "Aldevron", cause: "Vector index drift", mttr: "52m" },
+  { id: "INC-2412", severity: "Medium", app: "Content Studio", company: "Gordian", cause: "Quota throttling", mttr: "38m" },
+  { id: "INC-2407", severity: "Medium", app: "Procurement Agent", company: "Novamind", cause: "Vector index drift", mttr: "52m" },
   { id: "INC-2401", severity: "Low", app: "Sales Copilot", company: "Provation", cause: "Prompt regression", mttr: "21m" },
-  { id: "INC-2396", severity: "High", app: "Support Agent", company: "Aldevron", cause: "Upstream API outage", mttr: "1h 44m" },
+  { id: "INC-2396", severity: "High", app: "Support Agent", company: "Novamind", cause: "Upstream API outage", mttr: "1h 44m" },
 ];
 
 // ============ Section 6 - Governance ============
@@ -228,8 +221,8 @@ const SPEND_TREND = [
 const SPEND_BY_COMPANY = [
   { company: "Provation", spend: 384 },
   { company: "Fluke", spend: 296 },
-  { company: "Aldevron", spend: 248 },
-  { company: "Gordon", spend: 196 },
+  { company: "Novamind", spend: 248 },
+  { company: "Gordian", spend: 196 },
   { company: "Catalent", spend: 162 },
   { company: "HQ Platform", spend: 134 },
 ];
@@ -247,16 +240,16 @@ const OPTIMIZATIONS = [
 const ADVISOR = [
   { rec: "Reduce GPT-4o usage for internal search", biz: "Faster portfolio knowledge access", tech: "Route to Internal RAG-7B for low-risk queries", savings: "$420k / yr", conf: 94, prio: "High" },
   { rec: "Standardize on shared inference gateway", biz: "Unified observability + cost control", tech: "Replace 4 per-PortCo gateways with HQ gateway", savings: "$310k / yr", conf: 91, prio: "High" },
-  { rec: "Retire Content Studio pilot at Gordon", biz: "Eliminates 23% of failed-pilot drag", tech: "Migrate users to shared Marketing Studio", savings: "$132k / yr", conf: 88, prio: "High" },
+  { rec: "Retire Content Studio pilot at Gordian", biz: "Eliminates 23% of failed-pilot drag", tech: "Migrate users to shared Marketing Studio", savings: "$132k / yr", conf: 88, prio: "High" },
   { rec: "Adopt prompt caching across copilots", biz: "Latency -28%, cost -22% on hot prompts", tech: "Enable Redis-backed cache + TTL policy", savings: "$280k / yr", conf: 92, prio: "High" },
-  { rec: "Consolidate duplicate support agents", biz: "Single CSAT surface across PortCos", tech: "Merge 3 agents into Aldevron reference impl", savings: "$240k / yr", conf: 84, prio: "Medium" },
+  { rec: "Consolidate duplicate support agents", biz: "Single CSAT surface across PortCos", tech: "Merge 3 agents into Novamind reference impl", savings: "$240k / yr", conf: 84, prio: "Medium" },
   { rec: "Introduce model router with quality SLO", biz: "Reliability up, cost-per-outcome -18%", tech: "Open-source LiteLLM + quality scorer", savings: "$360k / yr", conf: 81, prio: "Medium" },
   { rec: "Add drift monitoring on Finance Close Bot", biz: "Prevents future audit findings", tech: "Weekly eval harness + alerting", savings: "Risk reduction", conf: 86, prio: "Medium" },
 ];
 
 const CTO_QUESTIONS = [
   { q: "Which models generate the highest cost?", a: "GPT-4o at $312k/mo (37% of model spend), followed by Claude 3.5 Sonnet ($198k). 41% of GPT-4o traffic is low-complexity and routable to cheaper models.", kpi: "GPT-4o · $312k/mo", rca: "Default routing in copilots sends every query to GPT-4o, regardless of complexity.", action: "Deploy model router with complexity classifier; expected $340k/yr savings." },
-  { q: "Which applications should be retired?", a: "Content Studio (Gordon) and Procurement Agent (Aldevron) — both pilots with <60 health, <50 users, and ROI not validated after 90 days.", kpi: "2 apps · $20k/mo", rca: "Insufficient executive sponsorship and overlap with shared HQ tools.", action: "Sunset within 30 days; migrate users to portfolio reference implementations." },
+  { q: "Which applications should be retired?", a: "Content Studio (Gordian) and Procurement Agent (Novamind) — both pilots with <60 health, <50 users, and ROI not validated after 90 days.", kpi: "2 apps · $20k/mo", rca: "Insufficient executive sponsorship and overlap with shared HQ tools.", action: "Sunset within 30 days; migrate users to portfolio reference implementations." },
   { q: "Which systems create reliability risk?", a: "Finance Close Bot (Catalent) at 99.41% availability and 2.34% error rate. Single point of failure on upstream forecasting API.", kpi: "1 app · 99.41%", rca: "No fallback model + synchronous upstream dependency.", action: "Add fallback to Claude 3.5 Sonnet + circuit breaker; expected MTTR -45%." },
   { q: "Where are governance gaps?", a: "Human review coverage on Customer Response AI is 58% — well below 80% threshold for high-impact externally-facing decisions.", kpi: "Review coverage 58%", rca: "Reviewer staffing gap + lack of sampling policy.", action: "Stand up review queue with stratified sampling; target 85% by Q4." },
   { q: "Which PortCo has the most mature AI platform?", a: "Provation. 28 apps in production, 99.97% availability, governance score 91, ROI 4.3x.", kpi: "Provation · 91/100", rca: "Centralized platform team, shared inference gateway, mature MLOps practice.", action: "Anoint Provation platform as portfolio reference architecture." },
@@ -329,12 +322,42 @@ function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   );
 }
 
+/** Resolves the active KPI set: a single company's KPIs, or the portfolio rollup when "All" is selected. */
+function useActiveKpis() {
+  const { company, period } = useWorkforce();
+  const activePeriod = period ?? DEFAULT_PERIOD;
+  const portfolioResult = usePortfolioKpis(activePeriod);
+  const singleResult = useKpis(company !== "all" ? company : "", activePeriod);
+  if (company === "all") {
+    return { kpis: portfolioResult.portfolio, isLoading: portfolioResult.isLoadingKpis };
+  }
+  return { kpis: singleResult.kpis, isLoading: singleResult.isLoading };
+}
+
 function Section1ExecKPIs() {
+  const { kpis, isLoading } = useActiveKpis();
+  const cards = [
+    { id: "availability_uptime", title: "Platform Availability", icon: <Activity className="w-4 h-4" />, accent: COLORS.green },
+    { id: "percent_ai_in_production", title: "AI in Production", icon: <Boxes className="w-4 h-4" />, accent: COLORS.indigo },
+    { id: "total_ai_spend", title: "Total AI Spend", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.amber },
+    { id: "p95_latency", title: "P95 Latency", icon: <Gauge className="w-4 h-4" />, accent: COLORS.teal },
+    { id: "ai_governance_score", title: "Governance Score", icon: <ShieldCheck className="w-4 h-4" />, accent: COLORS.violet },
+    { id: "critical_incident_count", title: "Critical Incidents", icon: <AlertTriangle className="w-4 h-4" />, accent: COLORS.red },
+  ];
   return (
     <section>
       <SectionHeader eyebrow="Section 1" title="Executive Technology KPI Summary" />
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {EXEC_KPIS.map((k) => <KpiCard key={k.title} {...k} />)}
+        {cards.map((c) => (
+          <KpiCard
+            key={c.id}
+            title={c.title}
+            icon={c.icon}
+            accent={c.accent}
+            value={isLoading ? "…" : kpis[c.id]?.display ?? "No data"}
+            footer={isLoading ? undefined : kpis[c.id] ? `Coverage ${Math.round((kpis[c.id].coverage ?? 0) * 100)}%` : "Not yet calculated"}
+          />
+        ))}
       </div>
     </section>
   );

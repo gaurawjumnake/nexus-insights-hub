@@ -51,7 +51,7 @@ export function AIAssistant() {
     setSending(true);
 
     try {
-      const res = await fetch(buildApiUrl("/chat"), {
+      const res = await fetch(buildApiUrl("/chat/ask"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg.content, contexts }),

@@ -38,20 +38,15 @@ import {
 } from "recharts";
 import { COLORS, GlassPanel, KpiCard, Pill } from "@/components/workforce/ui";
 import { useWorkforce } from "@/lib/workforce-context";
+import { useKpis } from "@/hooks/useKpis";
+import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
+import { DEFAULT_PERIOD } from "@/services/kpiService";
 
 export const Route = createFileRoute("/workforce/business")({
   component: BusinessPersonaView,
 });
 
-// ---------- Section 1: Executive KPIs ----------
-const EXEC_KPIS = [
-  { title: "AI Attributed Revenue", value: "$22.7M", trend: "+28% YoY", footer: "Top Quartile · Bench $14.2M", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.teal },
-  { title: "Revenue Uplift %", value: "6.4%", trend: "+2.1 pts", footer: "Top Quartile · Bench 3.8%", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.green },
-  { title: "EBITDA Impact", value: "$14.3M", trend: "+34% YoY", footer: "Top Quartile · Bench $8.9M", icon: <Percent className="w-4 h-4" />, accent: COLORS.indigo },
-  { title: "AI ROI", value: "4.2x", trend: "+0.9x", footer: "Top Quartile · Bench 2.7x", icon: <Target className="w-4 h-4" />, accent: COLORS.violet },
-  { title: "Payback Period", value: "9.2 mo", trend: "-3.4 mo", footer: "Top Quartile · Bench 14 mo", icon: <Clock className="w-4 h-4" />, accent: COLORS.amber, trendDirection: "up" as const },
-  { title: "Active AI Use Cases", value: "47", trend: "+12 QoQ", footer: "Median · Bench 52", icon: <Layers className="w-4 h-4" />, accent: COLORS.blue },
-];
+// ---------- Section 1: Executive KPIs (wired to real data below) ----------
 
 // ---------- Section 2: Revenue ----------
 const REV_KPIS = [
@@ -81,8 +76,8 @@ const REV_TREND_ANNUAL = [
 const REV_BY_COMPANY = [
   { company: "Provation", value: 7.2 },
   { company: "Fluke", value: 5.4 },
-  { company: "Gordon", value: 4.1 },
-  { company: "Aldevron", value: 3.6 },
+  { company: "Gordian", value: 4.1 },
+  { company: "Novamind", value: 3.6 },
   { company: "Catalent", value: 2.4 },
 ];
 
@@ -113,8 +108,8 @@ const EBITDA_KPIS = [
 const EBITDA_BY_COMPANY = [
   { company: "Provation", value: 4.3 },
   { company: "Fluke", value: 3.4 },
-  { company: "Gordon", value: 2.6 },
-  { company: "Aldevron", value: 2.2 },
+  { company: "Gordian", value: 2.6 },
+  { company: "Novamind", value: 2.2 },
   { company: "Catalent", value: 1.8 },
 ];
 
@@ -131,7 +126,7 @@ const COST_VS_VALUE = [
 
 const ROI_COMPARE = [
   { company: "Provation", roi: 5.1 }, { company: "Fluke", roi: 4.3 },
-  { company: "Gordon", roi: 3.8 }, { company: "Aldevron", roi: 3.4 },
+  { company: "Gordian", roi: 3.8 }, { company: "Novamind", roi: 3.4 },
   { company: "Catalent", roi: 2.6 },
 ];
 
@@ -192,39 +187,39 @@ const FUNCTIONS: Fn[] = [
 
 // ---------- Section 5: Replication ----------
 const REPLICATION = [
-  { source: "Provation", useCase: "Sales Copilot", benefit: "+22% Sales Productivity", target: "Gordon", ebitda: "$3.4M", roi: "3.8x", priority: "High", score: 92 },
+  { source: "Provation", useCase: "Sales Copilot", benefit: "+22% Sales Productivity", target: "Gordian", ebitda: "$3.4M", roi: "3.8x", priority: "High", score: 92 },
   { source: "Fluke", useCase: "Proposal Automation", benefit: "+31% Proposal Velocity", target: "Provation", ebitda: "$1.9M", roi: "2.6x", priority: "Medium", score: 78 },
-  { source: "Aldevron", useCase: "Customer Support Agent", benefit: "-42% Resolution Time", target: "Catalent", ebitda: "$2.4M", roi: "3.1x", priority: "High", score: 88 },
+  { source: "Novamind", useCase: "Customer Support Agent", benefit: "-42% Resolution Time", target: "Catalent", ebitda: "$2.4M", roi: "3.1x", priority: "High", score: 88 },
   { source: "Provation", useCase: "Knowledge Assistant", benefit: "+34% Agent Self-Serve", target: "Fluke", ebitda: "$1.2M", roi: "2.2x", priority: "Medium", score: 71 },
-  { source: "Gordon", useCase: "Marketing Content Studio", benefit: "+312% Content Velocity", target: "Aldevron", ebitda: "$1.6M", roi: "2.9x", priority: "High", score: 84 },
-  { source: "Catalent", useCase: "Finance Close Automation", benefit: "-31% Close Cycle", target: "Gordon", ebitda: "$1.1M", roi: "2.4x", priority: "Low", score: 64 },
+  { source: "Gordian", useCase: "Marketing Content Studio", benefit: "+312% Content Velocity", target: "Novamind", ebitda: "$1.6M", roi: "2.9x", priority: "High", score: 84 },
+  { source: "Catalent", useCase: "Finance Close Automation", benefit: "-31% Close Cycle", target: "Gordian", ebitda: "$1.1M", roi: "2.4x", priority: "Low", score: 64 },
 ];
 
 // ---------- Section 6: Advisor & Opportunities ----------
 const ADVISOR_RECS = [
-  { title: "Expand Sales Copilot Program", rationale: "Provation achieved 22% sales productivity gains. Deploying across Gordon and Fluke is expected to generate $4.2M incremental EBITDA.", value: "+$4.2M EBITDA", confidence: 91, priority: "High" },
-  { title: "Standardize Proposal Automation", rationale: "Fluke's proposal velocity uplift (+31%) can be replicated at Provation and Aldevron with shared template library and 6-week deployment.", value: "+$3.1M EBITDA", confidence: 87, priority: "High" },
-  { title: "Deploy Customer Support Agent at Catalent", rationale: "Aldevron's agent reduced resolution time 42% and lifted CSAT 9 pts. Catalent's ticket volume profile is near-identical.", value: "+$2.4M EBITDA", confidence: 84, priority: "High" },
-  { title: "Consolidate Marketing Content Studio", rationale: "Gordon's content engine ran 3x cheaper than peer stacks. Migrate Fluke and Aldevron onto the shared instance.", value: "-$1.2M OpEx", confidence: 79, priority: "Medium" },
+  { title: "Expand Sales Copilot Program", rationale: "Provation achieved 22% sales productivity gains. Deploying across Gordian and Fluke is expected to generate $4.2M incremental EBITDA.", value: "+$4.2M EBITDA", confidence: 91, priority: "High" },
+  { title: "Standardize Proposal Automation", rationale: "Fluke's proposal velocity uplift (+31%) can be replicated at Provation and Novamind with shared template library and 6-week deployment.", value: "+$3.1M EBITDA", confidence: 87, priority: "High" },
+  { title: "Deploy Customer Support Agent at Catalent", rationale: "Novamind's agent reduced resolution time 42% and lifted CSAT 9 pts. Catalent's ticket volume profile is near-identical.", value: "+$2.4M EBITDA", confidence: 84, priority: "High" },
+  { title: "Consolidate Marketing Content Studio", rationale: "Gordian's content engine ran 3x cheaper than peer stacks. Migrate Fluke and Novamind onto the shared instance.", value: "-$1.2M OpEx", confidence: 79, priority: "Medium" },
   { title: "Roll out Finance Close Automation", rationale: "Catalent's 31% close-cycle reduction translates directly to working-capital release across the portfolio.", value: "+$1.8M EBITDA", confidence: 76, priority: "Medium" },
   { title: "Launch Cross-Portfolio Knowledge Graph", rationale: "Pooled tacit knowledge unlocks asymmetric value in newly acquired companies; estimated 6-month onboarding compression.", value: "+$2.6M EBITDA", confidence: 68, priority: "Medium" },
   { title: "Sunset Underused Copilot Licenses", rationale: "23% of seats inactive >60 days. Reallocation reduces license spend with no productivity drag.", value: "-$0.9M OpEx", confidence: 92, priority: "Low" },
 ];
 
 const OPPORTUNITIES = [
-  { name: "Sales Copilot Expansion", company: "Gordon, Fluke", ebitda: "$4.2M", roi: "3.9x", difficulty: "Low" },
-  { name: "AI Proposal Automation", company: "Provation, Aldevron", ebitda: "$3.1M", roi: "2.8x", difficulty: "Medium" },
+  { name: "Sales Copilot Expansion", company: "Gordian, Fluke", ebitda: "$4.2M", roi: "3.9x", difficulty: "Low" },
+  { name: "AI Proposal Automation", company: "Provation, Novamind", ebitda: "$3.1M", roi: "2.8x", difficulty: "Medium" },
   { name: "Support Automation", company: "Catalent", ebitda: "$2.4M", roi: "3.1x", difficulty: "Low" },
-  { name: "Finance Automation", company: "Gordon", ebitda: "$1.8M", roi: "2.4x", difficulty: "Medium" },
+  { name: "Finance Automation", company: "Gordian", ebitda: "$1.8M", roi: "2.4x", difficulty: "Medium" },
   { name: "Knowledge Management Agent", company: "Portfolio-wide", ebitda: "$2.6M", roi: "2.2x", difficulty: "High" },
 ];
 
 const PE_QUESTIONS = [
   { q: "Which portfolio company generates the highest AI ROI?", a: "Provation leads at 5.1x ROI, driven by Sales Copilot and Knowledge Assistant adoption across 78% of revenue-facing roles.", kpi: "ROI 5.1x · EBITDA $4.3M", action: "Position Provation's enablement squad as the portfolio Center of Excellence.", value: "$1.4M coordination value" },
-  { q: "Which AI initiative should receive additional investment?", a: "Sales Copilot has the highest marginal ROI with 3-month payback at Gordon and Fluke. Doubling the deployment budget compresses time-to-value by ~40%.", kpi: "Marginal ROI 6.8x", action: "Approve $1.2M expansion package in next operating committee.", value: "+$4.2M EBITDA in 12 mo" },
-  { q: "Which use case should be replicated next?", a: "Customer Support Agent. Aldevron's playbook is well-documented and Catalent's volume profile is the closest match in the portfolio.", kpi: "Replication score 88", action: "Kick off 8-week deployment at Catalent.", value: "+$2.4M EBITDA" },
+  { q: "Which AI initiative should receive additional investment?", a: "Sales Copilot has the highest marginal ROI with 3-month payback at Gordian and Fluke. Doubling the deployment budget compresses time-to-value by ~40%.", kpi: "Marginal ROI 6.8x", action: "Approve $1.2M expansion package in next operating committee.", value: "+$4.2M EBITDA in 12 mo" },
+  { q: "Which use case should be replicated next?", a: "Customer Support Agent. Novamind's playbook is well-documented and Catalent's volume profile is the closest match in the portfolio.", kpi: "Replication score 88", action: "Kick off 8-week deployment at Catalent.", value: "+$2.4M EBITDA" },
   { q: "Which company is underperforming against peers?", a: "Catalent trails on AI adoption (28% vs portfolio 46%) and AI-attributed revenue ($2.4M vs $4.5M median).", kpi: "Adoption gap -18 pts", action: "Assign portfolio AI Operating Partner for 90-day intervention.", value: "$3.6M closing-the-gap upside" },
-  { q: "Where is the largest EBITDA opportunity?", a: "Sales motion. $4.2M unlocked by replicating Provation's Copilot pattern across Gordon and Fluke alone.", kpi: "Function · Sales", action: "Make Sales Copilot a portfolio-wide mandate this fiscal year.", value: "+$4.2M EBITDA" },
+  { q: "Where is the largest EBITDA opportunity?", a: "Sales motion. $4.2M unlocked by replicating Provation's Copilot pattern across Gordian and Fluke alone.", kpi: "Function · Sales", action: "Make Sales Copilot a portfolio-wide mandate this fiscal year.", value: "+$4.2M EBITDA" },
   { q: "Which business function is creating the most value?", a: "Sales contributes 38% of AI-attributed revenue, followed by Marketing (22%) and Customer Service (18%).", kpi: "Sales share 38%", action: "Allocate 50% of net-new AI investment to revenue-facing functions.", value: "Disproportionate value flow" },
 ];
 
@@ -263,13 +258,40 @@ function BusinessPersonaView() {
 }
 
 // ---------------- Section 1 ----------------
+function useActiveKpis() {
+  const { company, period } = useWorkforce();
+  const activePeriod = period ?? DEFAULT_PERIOD;
+  const portfolioResult = usePortfolioKpis(activePeriod);
+  const singleResult = useKpis(company !== "all" ? company : "", activePeriod);
+  if (company === "all") {
+    return { kpis: portfolioResult.portfolio, isLoading: portfolioResult.isLoadingKpis };
+  }
+  return { kpis: singleResult.kpis, isLoading: singleResult.isLoading };
+}
+
 function Section1ExecKPIs() {
+  const { kpis, isLoading } = useActiveKpis();
+  const cards = [
+    { id: "ai_revenue", title: "AI Attributed Revenue", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.teal },
+    { id: "cost_savings", title: "Cost Savings", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.green },
+    { id: "ebitda_uplift", title: "EBITDA Uplift", icon: <Percent className="w-4 h-4" />, accent: COLORS.indigo },
+    { id: "ai_roi", title: "AI ROI", icon: <Target className="w-4 h-4" />, accent: COLORS.violet },
+    { id: "payback_period", title: "Payback Period", icon: <Clock className="w-4 h-4" />, accent: COLORS.amber },
+    { id: "pipeline_influenced_revenue", title: "Pipeline Influenced Revenue", icon: <Layers className="w-4 h-4" />, accent: COLORS.blue },
+  ];
   return (
     <section>
       <SectionHeader eyebrow="Section 1" title="Executive KPI Summary" />
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {EXEC_KPIS.map((k) => (
-          <KpiCard key={k.title} {...k} />
+        {cards.map((c) => (
+          <KpiCard
+            key={c.id}
+            title={c.title}
+            icon={c.icon}
+            accent={c.accent}
+            value={isLoading ? "…" : kpis[c.id]?.display ?? "No data"}
+            footer={isLoading ? undefined : kpis[c.id] ? `Coverage ${Math.round((kpis[c.id].coverage ?? 0) * 100)}%` : "Not yet calculated"}
+          />
         ))}
       </div>
     </section>
