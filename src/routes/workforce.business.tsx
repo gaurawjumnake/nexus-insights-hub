@@ -6,7 +6,7 @@ import {
   Percent,
   Target,
   Clock,
-  Layers,
+  // Layers icon removed — no longer used after Section 1 rewrite
   ChevronDown,
   ChevronRight,
   Sparkles,
