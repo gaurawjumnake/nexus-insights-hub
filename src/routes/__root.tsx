@@ -123,11 +123,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="pr-56 min-h-screen">
+      <div className="pl-56 pr-[360px] min-h-screen transition-all">
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </div>
       <RightSidebar />
+      <AIAssistant />
     </QueryClientProvider>
   );
 }
