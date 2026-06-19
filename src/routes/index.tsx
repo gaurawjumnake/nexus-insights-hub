@@ -1012,7 +1012,12 @@ function TileCard({
   const isMock = !hasLiveValue;
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div
+      onClick={() => {
+        import("@/components/AIAssistant").then((m) => m.addAiContext(tile.title));
+      }}
+      className="overflow-hidden rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-teal-300 transition-colors"
+    >
       <div className={cn("h-[3px] w-full", accentBar[tile.accent])} />
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
