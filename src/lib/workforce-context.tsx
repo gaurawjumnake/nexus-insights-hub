@@ -1,28 +1,42 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
+import type { Company } from "@/services/kpiService";
 
-export const PORTFOLIO_COMPANIES = [
-  { value: "all", label: "All Portfolio Companies" },
-  { value: "company-a", label: "Company A" },
-  { value: "company-b", label: "Company B" },
-  { value: "company-c", label: "Company C" },
-  { value: "company-d", label: "Company D" },
-  { value: "company-e", label: "Company E" },
-] as const;
+export const WORKFORCE_DEFAULT_PERIOD = "2025-2026";
 
 type Ctx = {
+  /** "all" or backend company id */
   company: string;
   setCompany: (v: string) => void;
   companyLabel: string;
+  /** Backend-derived list (never hardcoded) */
+  companies: Company[];
+  period: string;
+  isLoadingCompanies: boolean;
 };
 
 const WorkforceCtx = createContext<Ctx | null>(null);
 
 export function WorkforceProvider({ children }: { children: ReactNode }) {
   const [company, setCompany] = useState<string>("all");
-  const companyLabel =
-    PORTFOLIO_COMPANIES.find((c) => c.value === company)?.label ?? "All Portfolio Companies";
+  const { companies, isLoadingCompanies } = usePortfolioKpis();
+
+  const companyLabel = useMemo(() => {
+    if (company === "all") return "All Portfolio Companies";
+    return companies.find((c) => c.id === company)?.label ?? company;
+  }, [company, companies]);
+
   return (
-    <WorkforceCtx.Provider value={{ company, setCompany, companyLabel }}>
+    <WorkforceCtx.Provider
+      value={{
+        company,
+        setCompany,
+        companyLabel,
+        companies,
+        period: WORKFORCE_DEFAULT_PERIOD,
+        isLoadingCompanies,
+      }}
+    >
       {children}
     </WorkforceCtx.Provider>
   );
