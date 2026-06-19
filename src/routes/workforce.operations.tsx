@@ -36,20 +36,15 @@ import {
 } from "recharts";
 import { COLORS, GlassPanel, KpiCard, Pill } from "@/components/workforce/ui";
 import { useWorkforce } from "@/lib/workforce-context";
+import { useKpis } from "@/hooks/useKpis";
+import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
+import { DEFAULT_PERIOD } from "@/services/kpiService";
 
 export const Route = createFileRoute("/workforce/operations")({
   component: OperationsPersonaView,
 });
 
-// ============ Section 1 - Executive Operations KPIs ============
-const EXEC_KPIS = [
-  { title: "Active AI Programs", value: "62", trend: "+11 QoQ", footer: "Target 70 · Bench 48", icon: <Layers className="w-4 h-4" />, accent: COLORS.indigo },
-  { title: "Production Use Cases", value: "47", trend: "+9 QoQ", footer: "76% of pipeline live", icon: <Rocket className="w-4 h-4" />, accent: COLORS.teal },
-  { title: "Adoption Rate", value: "68%", trend: "+12 pts", footer: "Top Quartile · Bench 54%", icon: <Users className="w-4 h-4" />, accent: COLORS.green },
-  { title: "Benefits Realized", value: "$18.7M", trend: "+14%", footer: "94% of Target · Top Quartile", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.violet },
-  { title: "Productivity Gain", value: "+31%", trend: "+6 pts", footer: "Hours saved 142k YTD", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.amber },
-  { title: "Portfolio Risk Score", value: "34/100", trend: "-8 pts", footer: "Lower is better · Bench 42", icon: <ShieldAlert className="w-4 h-4" />, accent: COLORS.red, trendDirection: "down" as const },
-];
+// ============ Section 1 - Executive Operations KPIs (wired to real data below) ============
 
 // ============ Section 2 - Program Execution ============
 const PROGRAM_KPIS = [
@@ -78,9 +73,9 @@ const DELIVERY_TREND = [
 
 const PROGRAM_ROWS = [
   { name: "Sales Copilot", company: "Provation", owner: "M. Chen", stage: "Scale", budget: "$1.4M", completion: 92, risk: "green", value: "$3.8M" },
-  { name: "Support Automation", company: "Gordon", owner: "R. Patel", stage: "Production", budget: "$0.9M", completion: 78, risk: "green", value: "$2.4M" },
+  { name: "Support Automation", company: "Gordian", owner: "R. Patel", stage: "Production", budget: "$0.9M", completion: 78, risk: "green", value: "$2.4M" },
   { name: "Finance Close AI", company: "Fluke", owner: "L. Garcia", stage: "UAT", budget: "$1.1M", completion: 61, risk: "amber", value: "$1.9M" },
-  { name: "Proposal Generator", company: "Aldevron", owner: "J. Kim", stage: "Build", budget: "$0.7M", completion: 44, risk: "amber", value: "$1.2M" },
+  { name: "Proposal Generator", company: "Novamind", owner: "J. Kim", stage: "Build", budget: "$0.7M", completion: 44, risk: "amber", value: "$1.2M" },
   { name: "Predictive Maintenance", company: "Fluke", owner: "S. Brown", stage: "Pilot", budget: "$1.6M", completion: 28, risk: "red", value: "$4.1M" },
   { name: "HR Onboarding Agent", company: "Catalent", owner: "T. Nguyen", stage: "Discovery", budget: "$0.4M", completion: 14, risk: "amber", value: "$0.8M" },
 ];
@@ -116,8 +111,8 @@ const ADOPTION_TREND = [
 const ADOPTION_BY_COMPANY = [
   { company: "Provation", rate: 84 },
   { company: "Fluke", rate: 74 },
-  { company: "Aldevron", rate: 67 },
-  { company: "Gordon", rate: 62 },
+  { company: "Novamind", rate: 67 },
+  { company: "Gordian", rate: 62 },
   { company: "Catalent", rate: 48 },
 ];
 
@@ -131,12 +126,12 @@ const ADOPTION_BY_DEPT = [
 ];
 
 const MATURITY_HEATMAP = [
-  { dept: "Sales", Provation: "Optimized", Fluke: "Scaling", Aldevron: "Scaling", Gordon: "Developing", Catalent: "Emerging" },
-  { dept: "Marketing", Provation: "Scaling", Fluke: "Scaling", Aldevron: "Developing", Gordon: "Developing", Catalent: "Emerging" },
-  { dept: "Operations", Provation: "Scaling", Fluke: "Optimized", Aldevron: "Scaling", Gordon: "Developing", Catalent: "Developing" },
-  { dept: "Finance", Provation: "Developing", Fluke: "Scaling", Aldevron: "Developing", Gordon: "Emerging", Catalent: "Emerging" },
-  { dept: "HR", Provation: "Developing", Fluke: "Developing", Aldevron: "Emerging", Gordon: "Emerging", Catalent: "Emerging" },
-  { dept: "Customer Support", Provation: "Optimized", Fluke: "Scaling", Aldevron: "Scaling", Gordon: "Optimized", Catalent: "Developing" },
+  { dept: "Sales", Provation: "Optimized", Fluke: "Scaling", Novamind: "Scaling", Gordian: "Developing", Catalent: "Emerging" },
+  { dept: "Marketing", Provation: "Scaling", Fluke: "Scaling", Novamind: "Developing", Gordian: "Developing", Catalent: "Emerging" },
+  { dept: "Operations", Provation: "Scaling", Fluke: "Optimized", Novamind: "Scaling", Gordian: "Developing", Catalent: "Developing" },
+  { dept: "Finance", Provation: "Developing", Fluke: "Scaling", Novamind: "Developing", Gordian: "Emerging", Catalent: "Emerging" },
+  { dept: "HR", Provation: "Developing", Fluke: "Developing", Novamind: "Emerging", Gordian: "Emerging", Catalent: "Emerging" },
+  { dept: "Customer Support", Provation: "Optimized", Fluke: "Scaling", Novamind: "Scaling", Gordian: "Optimized", Catalent: "Developing" },
 ];
 
 const MATURITY_COLOR: Record<string, string> = {
@@ -168,8 +163,8 @@ const HOURS_TREND = [
 const PRODUCTIVITY_BY_COMPANY = [
   { company: "Provation", gain: 38 },
   { company: "Fluke", gain: 34 },
-  { company: "Aldevron", gain: 29 },
-  { company: "Gordon", gain: 26 },
+  { company: "Novamind", gain: 29 },
+  { company: "Gordian", gain: 26 },
   { company: "Catalent", gain: 18 },
 ];
 
@@ -202,9 +197,9 @@ const PLANNED_VS_ACTUAL = [
 
 const REALIZATION_ROWS = [
   { initiative: "Sales Copilot", company: "Provation", target: "$3.4M", actual: "$3.8M", variance: "+12%", roi: "4.1x", status: "Exceeded" },
-  { initiative: "Support Automation", company: "Gordon", target: "$1.9M", actual: "$2.4M", variance: "+26%", roi: "3.8x", status: "Exceeded" },
+  { initiative: "Support Automation", company: "Gordian", target: "$1.9M", actual: "$2.4M", variance: "+26%", roi: "3.8x", status: "Exceeded" },
   { initiative: "Finance Close AI", company: "Fluke", target: "$1.8M", actual: "$1.6M", variance: "-11%", roi: "2.4x", status: "At Risk" },
-  { initiative: "Proposal Generator", company: "Aldevron", target: "$1.2M", actual: "$0.9M", variance: "-25%", roi: "1.8x", status: "Lagging" },
+  { initiative: "Proposal Generator", company: "Novamind", target: "$1.2M", actual: "$0.9M", variance: "-25%", roi: "1.8x", status: "Lagging" },
   { initiative: "Predictive Maintenance", company: "Fluke", target: "$4.1M", actual: "$1.2M", variance: "-71%", roi: "0.9x", status: "At Risk" },
 ];
 
@@ -218,12 +213,12 @@ const RISK_KPIS = [
 ];
 
 const RISK_HEATMAP = [
-  { category: "Schedule Risk", Provation: "Low", Fluke: "Medium", Aldevron: "Medium", Gordon: "Low", Catalent: "High" },
-  { category: "Adoption Risk", Provation: "Low", Fluke: "Low", Aldevron: "Medium", Gordon: "Medium", Catalent: "High" },
-  { category: "Budget Risk", Provation: "Low", Fluke: "High", Aldevron: "Low", Gordon: "Medium", Catalent: "Medium" },
-  { category: "Resource Risk", Provation: "Medium", Fluke: "Medium", Aldevron: "High", Gordon: "Low", Catalent: "High" },
-  { category: "Skills Risk", Provation: "Low", Fluke: "Medium", Aldevron: "Medium", Gordon: "High", Catalent: "Critical" },
-  { category: "Change Mgmt Risk", Provation: "Low", Fluke: "Low", Aldevron: "Medium", Gordon: "Medium", Catalent: "High" },
+  { category: "Schedule Risk", Provation: "Low", Fluke: "Medium", Novamind: "Medium", Gordian: "Low", Catalent: "High" },
+  { category: "Adoption Risk", Provation: "Low", Fluke: "Low", Novamind: "Medium", Gordian: "Medium", Catalent: "High" },
+  { category: "Budget Risk", Provation: "Low", Fluke: "High", Novamind: "Low", Gordian: "Medium", Catalent: "Medium" },
+  { category: "Resource Risk", Provation: "Medium", Fluke: "Medium", Novamind: "High", Gordian: "Low", Catalent: "High" },
+  { category: "Skills Risk", Provation: "Low", Fluke: "Medium", Novamind: "Medium", Gordian: "High", Catalent: "Critical" },
+  { category: "Change Mgmt Risk", Provation: "Low", Fluke: "Low", Novamind: "Medium", Gordian: "Medium", Catalent: "High" },
 ];
 
 const RISK_COLOR: Record<string, string> = {
@@ -236,9 +231,9 @@ const RISK_COLOR: Record<string, string> = {
 const ESCALATIONS = [
   { risk: "Skills gap — MLOps", company: "Catalent", program: "Predictive Maintenance", severity: "Critical", impact: "$4.1M at risk", mitigation: "Engage AI CoE; 2 contractor hires Q3" },
   { risk: "Budget overrun 28%", company: "Fluke", program: "Predictive Maintenance", severity: "High", impact: "$0.4M variance", mitigation: "Re-scope to top 3 plants" },
-  { risk: "Low end-user adoption", company: "Aldevron", program: "Proposal Generator", severity: "High", impact: "Benefit shortfall $0.3M", mitigation: "Champion program + manager incentives" },
+  { risk: "Low end-user adoption", company: "Novamind", program: "Proposal Generator", severity: "High", impact: "Benefit shortfall $0.3M", mitigation: "Champion program + manager incentives" },
   { risk: "UAT defect backlog", company: "Fluke", program: "Finance Close AI", severity: "Medium", impact: "Go-live slip 4 wks", mitigation: "Daily triage; vendor SLA escalation" },
-  { risk: "Data quality issues", company: "Gordon", program: "Support Automation", severity: "Medium", impact: "Model accuracy -7%", mitigation: "DQ remediation sprint" },
+  { risk: "Data quality issues", company: "Gordian", program: "Support Automation", severity: "Medium", impact: "Model accuracy -7%", mitigation: "DQ remediation sprint" },
 ];
 
 // ============ Section 7 - Transformation ============
@@ -252,8 +247,8 @@ const TRANSFORMATION_KPIS = [
 const PORTFOLIO_RANKING = [
   { company: "Provation", score: 88 },
   { company: "Fluke", score: 79 },
-  { company: "Aldevron", score: 71 },
-  { company: "Gordon", score: 64 },
+  { company: "Novamind", score: 71 },
+  { company: "Gordian", score: 64 },
   { company: "Catalent", score: 48 },
 ];
 
@@ -269,18 +264,18 @@ const MATURITY_PROGRESSION = [
 const SCORECARD = [
   { company: "Provation", score: 88, adoption: 84, prod: 38, value: 96, risk: "Low", status: "Leader" },
   { company: "Fluke", score: 79, adoption: 74, prod: 34, value: 89, risk: "Medium", status: "On Track" },
-  { company: "Aldevron", score: 71, adoption: 67, prod: 29, value: 82, risk: "Medium", status: "On Track" },
-  { company: "Gordon", score: 64, adoption: 62, prod: 26, value: 78, risk: "Medium", status: "Watch" },
+  { company: "Novamind", score: 71, adoption: 67, prod: 29, value: 82, risk: "Medium", status: "On Track" },
+  { company: "Gordian", score: 64, adoption: 62, prod: 26, value: 78, risk: "Medium", status: "Watch" },
   { company: "Catalent", score: 48, adoption: 48, prod: 18, value: 56, risk: "High", status: "Lagging" },
 ];
 
 // ============ Section 8 - Advisor & Q&A ============
 const RECOMMENDATIONS = [
-  { title: "Accelerate Support Automation Rollout", company: "Gordon", reason: "Adoption reached 78% and benefits exceed target by 24%.", impact: "Additional $2.3M annual savings", confidence: 92, priority: "High", owner: "R. Patel · COO" },
+  { title: "Accelerate Support Automation Rollout", company: "Gordian", reason: "Adoption reached 78% and benefits exceed target by 24%.", impact: "Additional $2.3M annual savings", confidence: 92, priority: "High", owner: "R. Patel · COO" },
   { title: "Pause Predictive Maintenance Scale", company: "Fluke", reason: "Skills gap and 28% budget overrun; ROI tracking 0.9x vs 2.4x target.", impact: "Avoid $1.8M further exposure", confidence: 88, priority: "Critical", owner: "S. Brown · VP Eng" },
-  { title: "Replicate Sales Copilot Playbook", company: "Aldevron + Gordon", reason: "Provation achieved 4.1x ROI; replication potential validated.", impact: "$5.4M cumulative uplift over 18 mo", confidence: 86, priority: "High", owner: "M. Chen · Sales Ops" },
+  { title: "Replicate Sales Copilot Playbook", company: "Novamind + Gordian", reason: "Provation achieved 4.1x ROI; replication potential validated.", impact: "$5.4M cumulative uplift over 18 mo", confidence: 86, priority: "High", owner: "M. Chen · Sales Ops" },
   { title: "Launch Adoption Recovery Plan", company: "Catalent", reason: "Adoption at 48%, lowest in portfolio; change resistance index elevated.", impact: "Lift adoption to 65%; unlock $1.4M", confidence: 79, priority: "High", owner: "T. Nguyen · CHRO" },
-  { title: "Consolidate Proposal Tools", company: "Aldevron", reason: "Three overlapping tools; usage fragmented; benefits 25% below plan.", impact: "$0.6M savings; +18% productivity", confidence: 81, priority: "Medium", owner: "J. Kim · Rev Ops" },
+  { title: "Consolidate Proposal Tools", company: "Novamind", reason: "Three overlapping tools; usage fragmented; benefits 25% below plan.", impact: "$0.6M savings; +18% productivity", confidence: 81, priority: "Medium", owner: "J. Kim · Rev Ops" },
   { title: "Invest in AI Champion Program", company: "Portfolio", reason: "Companies with champions see 2.1x adoption velocity.", impact: "+12 pts portfolio adoption", confidence: 84, priority: "Medium", owner: "AI CoE" },
   { title: "Standardize Benefits Tracking Cadence", company: "Portfolio", reason: "Variance in reporting; 2 of 5 PortCos missing weekly cadence.", impact: "Improve forecasting accuracy +18%", confidence: 90, priority: "Medium", owner: "PMO" },
 ];
@@ -318,7 +313,7 @@ const PARTNER_QUESTIONS = [
   },
   {
     q: "Which initiatives are not delivering expected value?",
-    a: "Predictive Maintenance (Fluke), Proposal Generator (Aldevron) and Finance Close AI (Fluke) are tracking below plan.",
+    a: "Predictive Maintenance (Fluke), Proposal Generator (Novamind) and Finance Close AI (Fluke) are tracking below plan.",
     kpis: ["3 initiatives at risk", "$2.5M variance", "Avg ROI 1.7x"],
     root: "Two have skills/data quality issues; one has adoption shortfall.",
     action: "Pause Predictive Maintenance scale; re-baseline Finance Close; champion-led push for Proposal Generator.",
@@ -326,7 +321,7 @@ const PARTNER_QUESTIONS = [
   },
   {
     q: "Where should transformation resources be allocated?",
-    a: "Concentrate on replicating proven plays from Provation and Fluke into Gordon and Catalent.",
+    a: "Concentrate on replicating proven plays from Provation and Fluke into Gordian and Catalent.",
     kpis: ["Replication potential: $5.4M", "Top 3 plays identified", "Capacity available: 22 FTE"],
     root: "Highest marginal return is in replication, not new pilots.",
     action: "Freeze net-new pilots in Q3; deploy CoE squads to replication.",
@@ -342,7 +337,7 @@ const PARTNER_QUESTIONS = [
   },
   {
     q: "Which programs should be accelerated?",
-    a: "Sales Copilot (Provation) and Support Automation (Gordon) are exceeding target; ready to scale.",
+    a: "Sales Copilot (Provation) and Support Automation (Gordian) are exceeding target; ready to scale.",
     kpis: ["Sales Copilot ROI: 4.1x", "Support Automation: +26% variance", "Scale capacity: 60 days"],
     root: "Proven adoption and benefit overachievement.",
     action: "Pull forward Q4 scale plan to Q3; allocate $0.8M incremental.",
@@ -359,10 +354,10 @@ const PARTNER_QUESTIONS = [
 ];
 
 const PLAYBOOK = [
-  { source: "Provation", initiative: "AI Support Automation", result: "34% productivity improvement", target: "Gordon, Fluke", expected: "$3.8M", priority: "High" },
-  { source: "Provation", initiative: "Sales Copilot", result: "4.1x ROI · +18% win rate", target: "Aldevron, Gordon", expected: "$5.4M", priority: "High" },
-  { source: "Fluke", initiative: "Finance Close AI", result: "Cycle -42%", target: "Provation, Aldevron", expected: "$2.1M", priority: "Medium" },
-  { source: "Gordon", initiative: "Knowledge Retrieval Agent", result: "32k hrs saved", target: "Catalent, Fluke", expected: "$1.6M", priority: "Medium" },
+  { source: "Provation", initiative: "AI Support Automation", result: "34% productivity improvement", target: "Gordian, Fluke", expected: "$3.8M", priority: "High" },
+  { source: "Provation", initiative: "Sales Copilot", result: "4.1x ROI · +18% win rate", target: "Novamind, Gordian", expected: "$5.4M", priority: "High" },
+  { source: "Fluke", initiative: "Finance Close AI", result: "Cycle -42%", target: "Provation, Novamind", expected: "$2.1M", priority: "Medium" },
+  { source: "Gordian", initiative: "Knowledge Retrieval Agent", result: "32k hrs saved", target: "Catalent, Fluke", expected: "$1.6M", priority: "Medium" },
   { source: "Provation", initiative: "Champion Network Model", result: "+22 pts adoption", target: "Portfolio", expected: "+12 pts adoption", priority: "High" },
 ];
 
@@ -422,12 +417,41 @@ function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   );
 }
 
+function useActiveKpis() {
+  const { company, period } = useWorkforce();
+  const activePeriod = period ?? DEFAULT_PERIOD;
+  const portfolioResult = usePortfolioKpis(activePeriod);
+  const singleResult = useKpis(company !== "all" ? company : "", activePeriod);
+  if (company === "all") {
+    return { kpis: portfolioResult.portfolio, isLoading: portfolioResult.isLoadingKpis };
+  }
+  return { kpis: singleResult.kpis, isLoading: singleResult.isLoading };
+}
+
 function Section1ExecKPIs() {
+  const { kpis, isLoading } = useActiveKpis();
+  const cards = [
+    { id: "total_ai_projects", title: "Active AI Programs", icon: <Layers className="w-4 h-4" />, accent: COLORS.indigo },
+    { id: "projects_in_production", title: "Production Use Cases", icon: <Rocket className="w-4 h-4" />, accent: COLORS.teal },
+    { id: "percent_ai_in_production", title: "Adoption Rate", icon: <Users className="w-4 h-4" />, accent: COLORS.green },
+    { id: "cost_savings", title: "Benefits Realized", icon: <DollarSign className="w-4 h-4" />, accent: COLORS.violet },
+    { id: "productivity_gain", title: "Productivity Gain", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.amber },
+    { id: "stalled_projects", title: "Stalled Projects", icon: <ShieldAlert className="w-4 h-4" />, accent: COLORS.red, trendDirection: "down" as const },
+  ];
   return (
     <section>
       <SectionHeader eyebrow="Section 1" title="Executive Operations KPI Summary" />
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {EXEC_KPIS.map((k) => <KpiCard key={k.title} {...k} />)}
+        {cards.map((c) => (
+          <KpiCard
+            key={c.id}
+            title={c.title}
+            icon={c.icon}
+            accent={c.accent}
+            value={isLoading ? "…" : kpis[c.id]?.display ?? "No data"}
+            footer={isLoading ? undefined : kpis[c.id] ? `Coverage ${Math.round((kpis[c.id].coverage ?? 0) * 100)}%` : "Not yet calculated"}
+          />
+        ))}
       </div>
     </section>
   );
@@ -591,14 +615,14 @@ function Section3Adoption() {
             <thead className="text-[11px] uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="py-2 pr-4">Department</th>
-                {["Provation", "Fluke", "Aldevron", "Gordon", "Catalent"].map((c) => <th key={c} className="py-2 px-3">{c}</th>)}
+                {["Provation", "Fluke", "Novamind", "Gordian", "Catalent"].map((c) => <th key={c} className="py-2 px-3">{c}</th>)}
               </tr>
             </thead>
             <tbody>
               {MATURITY_HEATMAP.map((r) => (
                 <tr key={r.dept} className="border-t border-slate-100">
                   <td className="py-2 pr-4 font-semibold text-slate-900">{r.dept}</td>
-                  {(["Provation", "Fluke", "Aldevron", "Gordon", "Catalent"] as const).map((c) => (
+                  {(["Provation", "Fluke", "Novamind", "Gordian", "Catalent"] as const).map((c) => (
                     <td key={c} className="py-2 px-3">
                       <span className={`inline-flex rounded-md px-2 py-1 text-[11px] font-medium ${MATURITY_COLOR[(r as any)[c]]}`}>{(r as any)[c]}</span>
                     </td>
@@ -764,14 +788,14 @@ function Section6Risk() {
             <thead className="text-[11px] uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="py-2 pr-4">Risk Category</th>
-                {["Provation", "Fluke", "Aldevron", "Gordon", "Catalent"].map((c) => <th key={c} className="py-2 px-3">{c}</th>)}
+                {["Provation", "Fluke", "Novamind", "Gordian", "Catalent"].map((c) => <th key={c} className="py-2 px-3">{c}</th>)}
               </tr>
             </thead>
             <tbody>
               {RISK_HEATMAP.map((r) => (
                 <tr key={r.category} className="border-t border-slate-100">
                   <td className="py-2 pr-4 font-semibold text-slate-900">{r.category}</td>
-                  {(["Provation", "Fluke", "Aldevron", "Gordon", "Catalent"] as const).map((c) => (
+                  {(["Provation", "Fluke", "Novamind", "Gordian", "Catalent"] as const).map((c) => (
                     <td key={c} className="py-2 px-3">
                       <span className={`inline-flex rounded-md px-2 py-1 text-[11px] ${RISK_COLOR[(r as any)[c]]}`}>{(r as any)[c]}</span>
                     </td>
@@ -851,8 +875,8 @@ function Section7Transformation() {
                 <Legend wrapperStyle={{ fontSize: 11 }} />
                 <Line type="monotone" dataKey="provation" name="Provation" stroke={COLORS.green} strokeWidth={2.5} dot={false} />
                 <Line type="monotone" dataKey="fluke" name="Fluke" stroke={COLORS.teal} strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="aldevron" name="Aldevron" stroke={COLORS.indigo} strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="gordon" name="Gordon" stroke={COLORS.amber} strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="aldevron" name="Novamind" stroke={COLORS.indigo} strokeWidth={2.5} dot={false} />
+                <Line type="monotone" dataKey="gordon" name="Gordian" stroke={COLORS.amber} strokeWidth={2.5} dot={false} />
                 <Line type="monotone" dataKey="catalent" name="Catalent" stroke={COLORS.red} strokeWidth={2.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
