@@ -12,7 +12,7 @@ import {
   Activity,
   Home,
 } from "lucide-react";
-import { PORTFOLIO_COMPANIES, WorkforceProvider, useWorkforce } from "@/lib/workforce-context";
+import { WorkforceProvider, useWorkforce } from "@/lib/workforce-context";
 
 export const Route = createFileRoute("/workforce")({
   component: WorkforceLayout,
@@ -196,7 +196,7 @@ function Header() {
   const search = useRouterState({ select: (s) => s.location.search as { persona?: string } });
   const personaKey = (search?.persona ?? "all").toLowerCase();
   const persona = PERSONA_META[personaKey] ?? PERSONA_META.all;
-  const { company, setCompany } = useWorkforce();
+  const { company, setCompany, companies, isLoadingCompanies } = useWorkforce();
 
   const current = NAV.flatMap((g) => g.items).find((i) =>
     i.to === "/workforce" ? pathname === "/workforce" : pathname.startsWith(i.to),
@@ -233,8 +233,14 @@ function Header() {
           onChange={(e) => setCompany(e.target.value)}
           className="text-[13px] px-3 py-2 rounded-md border border-slate-200 bg-white text-slate-900 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
         >
-          {PORTFOLIO_COMPANIES.map((c) => (
-            <option key={c.value} value={c.value}>
+          <option value="all">All Portfolio Companies</option>
+          {isLoadingCompanies && companies.length === 0 && (
+            <option value="all" disabled>
+              Loading companies…
+            </option>
+          )}
+          {companies.map((c) => (
+            <option key={c.id} value={c.id}>
               {c.label}
             </option>
           ))}
