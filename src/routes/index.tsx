@@ -715,6 +715,35 @@ const SUMMARY_DEFS: { label: string; kpiId: string; icon: typeof Globe }[] = [
   { label: "Prod Projects", kpiId: "projects_in_production", icon: Zap },
 ];
 
+// Map persona-tile titles to backend KPI ids.
+// When a live value exists it overrides tile.value; otherwise the existing
+// mock value is kept as a graceful fallback. Missing-but-expected => "-".
+const TILE_TITLE_TO_KPI: Record<string, string> = {
+  "AI-Attributed Revenue": "ai_revenue",
+  "Revenue Uplift (AI-Attributed)": "ai_revenue",
+  "AI ROI (Portfolio-wide)": "ai_roi",
+  "Total AI Spend vs Budget": "total_ai_spend",
+  "AI EBITDA Uplift (pp)": "ebitda_uplift",
+  "EBITDA Margin Impact": "ebitda_uplift",
+  "Cost per Outcome (Unit Economics)": "cost_per_outcome",
+  "Portfolio AI Adoption Score": "portfolio_ai_adoption_score",
+  "AI Projects: Prod vs PoC": "projects_in_production",
+  "AI Maturity Score (Composite)": "ai_maturity_score",
+  "AI Governance Score": "ai_governance_score",
+  "Policy Compliance Rate": "policy_compliance_rate",
+  "Aggregate Cost Savings": "cost_savings",
+  "Human Productivity Gains": "productivity_gain",
+  "AI Policy Compliance": "policy_compliance_rate",
+  "DAU / MAU Intensity": "active_ai_users",
+  "Production Velocity": "projects_in_production",
+  "Human Review Coverage": "human_review_coverage",
+  "Industry Benchmark": "industry_benchmark_ratio",
+  "Active AI Users": "active_ai_users",
+  "% AI in Production": "percent_ai_in_production",
+  "Availability (Uptime)": "availability_uptime",
+  "Forecasted Spend (Q4)": "forecasted_ai_spend",
+};
+
 function NexusDashboard() {
   const [persona, setPersona] = useState<Persona>("cxo");
   const [subTab, setSubTab] = useState<SubTab>("all");
