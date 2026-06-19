@@ -41,7 +41,7 @@ export function RightSidebar() {
   return (
     <aside
       className={cn(
-        "fixed right-0 top-0 z-40 h-screen bg-white border-l border-slate-200 shadow-sm transition-all duration-200 flex flex-col",
+        "fixed left-0 top-0 z-40 h-screen bg-white border-r border-slate-200 shadow-sm transition-all duration-200 flex flex-col",
         collapsed ? "w-12" : "w-56",
       )}
       style={{ fontFamily: "Inter, system-ui, sans-serif" }}
@@ -51,12 +51,12 @@ export function RightSidebar() {
         className="h-12 flex items-center justify-center border-b border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
-        {collapsed ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         {!collapsed && (
-          <span className="ml-2 text-[12px] font-semibold tracking-wide text-slate-700">
+          <span className="mr-2 text-[12px] font-semibold tracking-wide text-slate-700">
             NAVIGATION
           </span>
         )}
+        {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
       </button>
 
       <nav className="flex-1 overflow-y-auto py-2">
