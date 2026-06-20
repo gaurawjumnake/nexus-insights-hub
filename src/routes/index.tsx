@@ -896,10 +896,13 @@ function NexusDashboard() {
             })}
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50">
+            <Link
+              to="/upload"
+              className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50"
+            >
               <Plus className="h-4 w-4" />
               Add PortCo
-            </button>
+            </Link>
             <button className="flex items-center gap-2 rounded-md border border-rose-200 px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-50">
               <Trash2 className="h-4 w-4" />
               Remove
