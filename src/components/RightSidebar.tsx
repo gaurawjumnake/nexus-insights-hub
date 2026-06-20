@@ -33,11 +33,14 @@ const PERSONA_NAV: NavItem[] = [
   { to: "/workforce/business", label: "Business", icon: Briefcase },
   { to: "/workforce/operations", label: "Operations", icon: Settings2 },
   { to: "/workforce/technology", label: "Technology", icon: Cpu },
-  { to: "/workforce/portfolio", label: "Portfolio (PortCo)", icon: LayoutDashboard },
+];
+
+const COMPARATIVE_NAV: NavItem[] = [
+  { to: "/compare", label: "Snapshot", icon: GitCompare },
+  { to: "/workforce/portfolio", label: "Portfolio", icon: LayoutDashboard },
 ];
 
 const BOTTOM_NAV: NavItem[] = [
-  { to: "/compare", label: "PortCo Comparison", icon: GitCompare },
   { to: "/upload", label: "Upload Documents", icon: Upload },
 ];
 
@@ -49,7 +52,12 @@ export function RightSidebar() {
     () => PERSONA_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
     [pathname],
   );
+  const comparativeActive = useMemo(
+    () => COMPARATIVE_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
+    [pathname],
+  );
   const [personasOpen, setPersonasOpen] = useState(true);
+  const [comparativeOpen, setComparativeOpen] = useState(true);
 
   const renderItem = (item: NavItem, opts?: { nested?: boolean }) => {
     const Icon = item.icon;
@@ -127,6 +135,34 @@ export function RightSidebar() {
         </button>
         {(personasOpen || collapsed) &&
           PERSONA_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
+
+        {/* Comparative Analysis collapsible group */}
+        <button
+          type="button"
+          onClick={() => setComparativeOpen((o) => !o)}
+          className={cn(
+            "w-[calc(100%-1rem)] mx-2 my-0.5 flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] transition-colors",
+            comparativeActive
+              ? "text-teal-700 font-semibold"
+              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+          )}
+          aria-expanded={comparativeOpen}
+          title="Comparative Analysis"
+        >
+          <GitCompare className="w-4 h-4 shrink-0" />
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Comparative Analysis</span>
+              {comparativeOpen ? (
+                <ChevronDown className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronRight className="w-3.5 h-3.5" />
+              )}
+            </>
+          )}
+        </button>
+        {(comparativeOpen || collapsed) &&
+          COMPARATIVE_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
 
         {BOTTOM_NAV.map((item) => renderItem(item))}
       </nav>
