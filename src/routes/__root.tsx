@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { RightSidebar } from "../components/RightSidebar";
 import { AIAssistant } from "../components/AIAssistant";
+import { useAiCollapsed } from "../lib/ai-assistant-state";
 
 function NotFoundComponent() {
   return (
