@@ -14,7 +14,11 @@ export function addAiContext(label: string) {
 }
 
 export function AIAssistant() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsedState] = useState(false);
+  const setCollapsed = (v: boolean) => {
+    setCollapsedState(v);
+    setAiCollapsed(v);
+  };
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
