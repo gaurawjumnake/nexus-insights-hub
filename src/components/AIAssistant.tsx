@@ -94,15 +94,15 @@ export function AIAssistant() {
     return (
       <button
         onClick={() => setCollapsed(false)}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2 rounded-l-md bg-teal-600 px-2 py-3 text-white shadow-md hover:bg-teal-700"
+        className="group fixed right-0 top-1/2 -translate-y-1/2 z-40 flex w-11 flex-col items-center gap-2 rounded-l-xl bg-teal-600 px-2 py-4 text-white shadow-lg ring-1 ring-teal-700/20 transition-all hover:bg-teal-700 hover:scale-[1.03]"
         aria-label="Open AI Assistant"
         style={{ fontFamily: "Inter, system-ui, sans-serif" }}
       >
-        <Bot className="h-4 w-4" />
-        <span className="text-[10px] font-semibold tracking-wider [writing-mode:vertical-rl] rotate-180">
+        <Sparkles className="h-5 w-5" />
+        <span className="text-[10px] font-bold tracking-[0.18em] [writing-mode:vertical-rl] rotate-180">
           AI ASSISTANT
         </span>
-        <ChevronLeft className="h-3 w-3" />
+        <ChevronLeft className="h-3.5 w-3.5 opacity-80 group-hover:opacity-100" />
       </button>
     );
   }
