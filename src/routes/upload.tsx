@@ -141,25 +141,43 @@ function UploadPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-medium text-slate-700 mb-1">
-                Company ID
+                Company ID <span className="text-rose-500">*</span>
               </label>
               <input
                 value={companyId}
-                onChange={(e) => setCompanyId(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                placeholder="novamind"
+                onChange={(e) => {
+                  setCompanyId(e.target.value);
+                  if (errors.companyId) setErrors((p) => ({ ...p, companyId: undefined }));
+                }}
+                aria-required="true"
+                aria-invalid={!!errors.companyId}
+                className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                  errors.companyId ? "border-rose-400" : "border-slate-200"
+                }`}
               />
+              {errors.companyId && (
+                <div className="text-[11px] text-rose-600 mt-1">{errors.companyId}</div>
+              )}
             </div>
             <div>
               <label className="block text-[12px] font-medium text-slate-700 mb-1">
-                Period
+                Persona <span className="text-rose-500">*</span>
               </label>
               <input
-                value={period}
-                onChange={(e) => setPeriod(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                placeholder="2025-2026"
+                value={persona}
+                onChange={(e) => {
+                  setPersona(e.target.value);
+                  if (errors.persona) setErrors((p) => ({ ...p, persona: undefined }));
+                }}
+                aria-required="true"
+                aria-invalid={!!errors.persona}
+                className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                  errors.persona ? "border-rose-400" : "border-slate-200"
+                }`}
               />
+              {errors.persona && (
+                <div className="text-[11px] text-rose-600 mt-1">{errors.persona}</div>
+              )}
             </div>
           </div>
         </div>
@@ -168,15 +186,18 @@ function UploadPage() {
         <div
           onDragOver={(e) => {
             e.preventDefault();
-            setDragging(true);
+            if (validateContext()) setDragging(true);
           }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => {
             e.preventDefault();
             setDragging(false);
+            if (!validateContext()) return;
             handleFiles(e.dataTransfer.files);
           }}
-          onClick={() => inputRef.current?.click()}
+          onClick={() => {
+            if (validateContext()) inputRef.current?.click();
+          }}
           className={`rounded-xl border-2 border-dashed p-12 text-center cursor-pointer transition-colors ${
             dragging
               ? "border-teal-500 bg-teal-50"
@@ -199,6 +220,21 @@ function UploadPage() {
             accept=".pdf,.docx,.xlsx,.pptx,.csv,.txt,.md"
           />
         </div>
+
+        {/* Upload button */}
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              if (validateContext()) inputRef.current?.click();
+            }}
+            className="px-4 py-2 rounded-md bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 flex items-center gap-2"
+          >
+            <UploadIcon className="w-4 h-4" />
+            Upload
+          </button>
+        </div>
+
 
         {/* File list */}
         {docs.length > 0 && (
