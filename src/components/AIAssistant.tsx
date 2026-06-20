@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, Send, X, ChevronRight, ChevronLeft } from "lucide-react";
+import { Bot, Send, X, ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildApiUrl } from "@/config/api";
+import { setAiCollapsed } from "@/lib/ai-assistant-state";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
