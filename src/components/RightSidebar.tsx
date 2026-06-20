@@ -33,11 +33,14 @@ const PERSONA_NAV: NavItem[] = [
   { to: "/workforce/business", label: "Business", icon: Briefcase },
   { to: "/workforce/operations", label: "Operations", icon: Settings2 },
   { to: "/workforce/technology", label: "Technology", icon: Cpu },
-  { to: "/workforce/portfolio", label: "Portfolio (PortCo)", icon: LayoutDashboard },
+];
+
+const COMPARATIVE_NAV: NavItem[] = [
+  { to: "/compare", label: "Snapshot", icon: GitCompare },
+  { to: "/workforce/portfolio", label: "Portfolio", icon: LayoutDashboard },
 ];
 
 const BOTTOM_NAV: NavItem[] = [
-  { to: "/compare", label: "PortCo Comparison", icon: GitCompare },
   { to: "/upload", label: "Upload Documents", icon: Upload },
 ];
 
