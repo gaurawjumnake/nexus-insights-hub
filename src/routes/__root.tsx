@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { RightSidebar } from "../components/RightSidebar";
 import { AIAssistant } from "../components/AIAssistant";
+import { useAiCollapsed } from "../lib/ai-assistant-state";
 
 function NotFoundComponent() {
   return (
@@ -120,10 +121,13 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const aiCollapsed = useAiCollapsed();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="pl-56 pr-[360px] min-h-screen transition-all">
+      <div
+        className={`pl-56 min-h-screen transition-all ${aiCollapsed ? "pr-12" : "pr-[360px]"}`}
+      >
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </div>
