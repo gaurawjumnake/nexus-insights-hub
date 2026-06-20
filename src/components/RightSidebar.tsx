@@ -52,7 +52,12 @@ export function RightSidebar() {
     () => PERSONA_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
     [pathname],
   );
+  const comparativeActive = useMemo(
+    () => COMPARATIVE_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
+    [pathname],
+  );
   const [personasOpen, setPersonasOpen] = useState(true);
+  const [comparativeOpen, setComparativeOpen] = useState(true);
 
   const renderItem = (item: NavItem, opts?: { nested?: boolean }) => {
     const Icon = item.icon;
