@@ -32,14 +32,23 @@ type UploadedDoc = {
 };
 
 function UploadPage() {
-  const [companyId, setCompanyId] = useState("novamind");
-  const [period, setPeriod] = useState("2025-2026");
+  const [companyId, setCompanyId] = useState("");
+  const [persona, setPersona] = useState("");
   const [docs, setDocs] = useState<UploadedDoc[]>([]);
   const [dragging, setDragging] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [calcMessage, setCalcMessage] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ companyId?: string; persona?: string }>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+
+  function validateContext() {
+    const next: { companyId?: string; persona?: string } = {};
+    if (!companyId.trim()) next.companyId = "Company ID is required";
+    if (!persona.trim()) next.persona = "Persona is required";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }
 
   async function uploadFile(file: File) {
     const id = crypto.randomUUID();
