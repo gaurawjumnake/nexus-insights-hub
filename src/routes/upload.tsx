@@ -284,7 +284,7 @@ function UploadPage() {
             </div>
             <div className="text-[12px] text-slate-500 mt-0.5">
               Trigger the pipeline for <span className="font-mono">{companyId}</span> ·{" "}
-              <span className="font-mono">{period}</span>. {successCount} document
+              <span className="font-mono">{persona}</span>. {successCount} document
               {successCount === 1 ? "" : "s"} ready.
             </div>
             {calcMessage && (
