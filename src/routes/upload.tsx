@@ -60,7 +60,7 @@ function UploadPage() {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("company_id", companyId);
-    fd.append("period", period);
+    fd.append("period", persona);
 
     try {
       const res = await fetch(buildApiUrl("/documents/upload"), {
@@ -99,7 +99,7 @@ function UploadPage() {
       const res = await fetch(buildApiUrl("/kpis/calculate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company_id: companyId, period }),
+        body: JSON.stringify({ company_id: companyId, period: persona }),
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body?.detail || `Calculate failed [${res.status}]`);
