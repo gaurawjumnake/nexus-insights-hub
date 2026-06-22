@@ -72,7 +72,14 @@ export function usePortfolioKpis(period?: string): UsePortfolioKpisResult {
 
   const filteredKpis = useMemo(() => {
     if (!period) return allKpis
-    return allKpis.filter((r) => r.period === period)
+    const matched = allKpis.filter((r) => r.period === period)
+    if (matched.length > 0) return matched
+    // Requested period has no data — fall back to the most common period in the dataset
+    if (allKpis.length === 0) return []
+    const counts = new Map<string, number>()
+    for (const r of allKpis) { if (r.period) counts.set(r.period, (counts.get(r.period) ?? 0) + 1) }
+    const best = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
+    return best ? allKpis.filter((r) => r.period === best) : allKpis
   }, [allKpis, period])
 
   const companies = useMemo<Company[]>(() => {

@@ -5,10 +5,10 @@
  *
  * IMPORTANT: this backend has no /companies endpoint (confirmed via its
  * Swagger schema — only /kpis/, /kpis/{company_id}/{period}, /kpis/extract,
- * /kpis/calculate, /kpis/insights, /documents/*, /health exist). The only
- * reliable way to discover which companies/periods exist is to call
- * GET /kpis/ (returns { kpis: RawKpi[] } for every company) and group by
- * company_id ourselves. We do that instead of guessing company names.
+ * /kpis/calculate, /kpis/trend, /kpis/insights, /documents/*, /health exist).
+ * The only reliable way to discover which companies/periods exist is to
+ * call GET /kpis/ (returns { kpis: RawKpi[] } for every company) and group
+ * by company_id ourselves. We do that instead of guessing company names.
  */
 import type { RawKpi } from '@/lib/normaliseKpi'
 import { buildApiUrl } from '@/config/api'
@@ -120,4 +120,59 @@ export async function getKPIs(
     }),
   )
   return Object.fromEntries(entries)
+}
+
+// ─── Trend (MoM / QoQ / YoY) ──────────────────────────────────────────────
+
+export interface TrendPeriodResult {
+  kpi_id: string
+  value: number | string | null
+  coverage: number
+  status: string
+  period: string
+  missing_facts?: string[]
+}
+
+export interface TrendResponse {
+  company_id: string
+  period_type: 'month' | 'quarter' | 'year'
+  start_period: string
+  end_period: string
+  results: Record<string, TrendPeriodResult[]>
+}
+
+/**
+ * POST /kpis/trend → { results: { [kpi_id]: TrendPeriodResult[] } }
+ *
+ * One formula evaluated once per period between startPeriod and
+ * endPeriod (inclusive). A period with no underlying data on the
+ * backend comes back with status "insufficient_data" and value null -
+ * the frontend should render that as a gap, never as zero or a
+ * carried-over neighbor value.
+ */
+export async function getKpiTrend(
+  companyId: string,
+  kpiIds: string[],
+  periodType: 'month' | 'quarter' | 'year',
+  startPeriod: string,
+  endPeriod: string,
+  saveResults = false,
+): Promise<TrendResponse> {
+  const res = await fetch(buildApiUrl('/kpis/trend'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      company_id: companyId,
+      kpi_ids: kpiIds,
+      period_type: periodType,
+      start_period: startPeriod,
+      end_period: endPeriod,
+      save_results: saveResults,
+    }),
+  })
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`KPI trend fetch failed [${res.status}]: ${body}`)
+  }
+  return res.json()
 }

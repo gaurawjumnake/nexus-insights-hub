@@ -123,6 +123,12 @@ function formatDisplay(id: string, value: number): string {
   if (id === 'ai_roi' || id === 'industry_benchmark_ratio' || id === 'production_ratio')
     return `${value.toFixed(2)}x`
 
+  // Latency — milliseconds
+  if (id === 'p95_latency') return `${Math.round(value)} ms`
+
+  // Payback period — months
+  if (id === 'payback_period') return `${value.toFixed(1)} mo`
+
   // Scores out of 5
   if (
     id === 'ai_maturity_score' ||

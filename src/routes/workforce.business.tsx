@@ -39,6 +39,9 @@ import {
 import { COLORS, GlassPanel, KpiCard, Pill } from "@/components/workforce/ui";
 import { useWorkforce } from "@/lib/workforce-context";
 import { selectContextKpis, usePortfolioKpis } from "@/hooks/usePortfolioKpis";
+import { useKpiTrend } from "@/hooks/useKpiTrend";
+import { TrendGranularityToggle } from "@/components/charts/TrendGranularityToggle";
+import type { Grain } from "@/lib/periods";
 
 export const Route = createFileRoute("/workforce/business")({
   component: BusinessPersonaView,
@@ -60,23 +63,6 @@ const REV_KPIS = [
   { title: "AI Assisted Revenue", value: "$8.1M", trend: "+22% YoY", icon: <Sparkles className="w-4 h-4" />, accent: COLORS.indigo, footer: "Copilot-augmented deals" },
   { title: "Pipeline Influenced Revenue", value: "$31.2M", trend: "+38% YoY", icon: <TrendingUp className="w-4 h-4" />, accent: COLORS.violet, footer: "Open opportunities" },
   { title: "Upsell / Cross-Sell Revenue", value: "$5.2M", trend: "+19% YoY", icon: <Trophy className="w-4 h-4" />, accent: COLORS.green, footer: "Driven by AI signals" },
-];
-
-const REV_TREND_MONTHLY = [
-  { p: "Jan", direct: 0.5, assisted: 0.4 }, { p: "Feb", direct: 0.6, assisted: 0.5 },
-  { p: "Mar", direct: 0.7, assisted: 0.55 }, { p: "Apr", direct: 0.75, assisted: 0.6 },
-  { p: "May", direct: 0.8, assisted: 0.65 }, { p: "Jun", direct: 0.85, assisted: 0.7 },
-  { p: "Jul", direct: 0.9, assisted: 0.72 }, { p: "Aug", direct: 0.95, assisted: 0.74 },
-  { p: "Sep", direct: 1.0, assisted: 0.78 }, { p: "Oct", direct: 1.05, assisted: 0.82 },
-  { p: "Nov", direct: 1.1, assisted: 0.85 }, { p: "Dec", direct: 1.15, assisted: 0.9 },
-];
-const REV_TREND_QUARTERLY = [
-  { p: "Q1", direct: 1.8, assisted: 1.45 }, { p: "Q2", direct: 2.4, assisted: 1.95 },
-  { p: "Q3", direct: 2.85, assisted: 2.24 }, { p: "Q4", direct: 3.3, assisted: 2.57 },
-];
-const REV_TREND_ANNUAL = [
-  { p: "2022", direct: 4.1, assisted: 3.2 }, { p: "2023", direct: 6.6, assisted: 5.2 },
-  { p: "2024", direct: 9.4, assisted: 8.1 },
 ];
 
 const REV_BY_COMPANY = [
@@ -288,8 +274,19 @@ function Section1ExecKPIs() {
 
 // ---------------- Section 2 ----------------
 function Section2Revenue() {
-  const [grain, setGrain] = useState<"M" | "Q" | "A">("Q");
-  const trendData = grain === "M" ? REV_TREND_MONTHLY : grain === "Q" ? REV_TREND_QUARTERLY : REV_TREND_ANNUAL;
+  const { company } = useWorkforce();
+  const [grain, setGrain] = useState<Grain>("Q");
+  const { data: trendData, isLoading: trendLoading, error: trendError } = useKpiTrend(
+    company,
+    { direct: "direct_ai_revenue", assisted: "ai_assisted_revenue" },
+    grain,
+  );
+  // Backend values are raw USD; this chart's axis is labeled ($M).
+  const trendDataInMillions = trendData.map((row) => ({
+    ...row,
+    direct: row.direct == null ? null : row.direct / 1_000_000,
+    assisted: row.assisted == null ? null : row.assisted / 1_000_000,
+  }));
   return (
     <section>
       <SectionHeader eyebrow="Section 2" title="Revenue & Growth Impact" />
@@ -301,30 +298,34 @@ function Section2Revenue() {
         <GlassPanel
           title="Revenue Trend Over Time"
           description="AI-direct vs AI-assisted revenue ($M)"
-          action={
-            <div className="inline-flex rounded-md border border-slate-200 bg-slate-50 p-0.5 text-[11px] font-medium">
-              {([["M","Monthly"],["Q","Quarterly"],["A","Annual"]] as const).map(([id, lbl]) => (
-                <button key={id} onClick={() => setGrain(id)}
-                  className={`px-2.5 py-1 rounded ${grain===id ? "bg-white text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
-                  {lbl}
-                </button>
-              ))}
-            </div>
-          }
+          action={<TrendGranularityToggle value={grain} onChange={setGrain} />}
         >
-          <div className="h-64">
-            <ResponsiveContainer>
-              <LineChart data={trendData}>
-                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
-                <XAxis dataKey="p" stroke="#64748b" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e2e8f0", fontSize: 12 }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line type="monotone" dataKey="direct" name="AI Direct" stroke={COLORS.teal} strokeWidth={2.5} dot={false} />
-                <Line type="monotone" dataKey="assisted" name="AI Assisted" stroke={COLORS.indigo} strokeWidth={2.5} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {company === "all" ? (
+            <div className="flex h-64 items-center justify-center text-sm text-slate-500">
+              Select a portfolio company to view its revenue trend.
+            </div>
+          ) : trendError ? (
+            <div className="flex h-64 items-center justify-center text-sm text-red-500">
+              Couldn't load trend data: {trendError.message}
+            </div>
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer>
+                <LineChart data={trendDataInMillions}>
+                  <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                  <XAxis dataKey="p" stroke="#64748b" tick={{ fontSize: 11 }} />
+                  <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+                  <Tooltip contentStyle={{ background: "#fff", border: "1px solid #e2e8f0", fontSize: 12 }} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Line type="monotone" dataKey="direct" name="AI Direct" stroke={COLORS.teal} strokeWidth={2.5} dot={false} />
+                  <Line type="monotone" dataKey="assisted" name="AI Assisted" stroke={COLORS.indigo} strokeWidth={2.5} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+              {trendLoading && (
+                <p className="mt-1 text-[11px] text-slate-400">Refreshing…</p>
+              )}
+            </div>
+          )}
         </GlassPanel>
 
         <GlassPanel title="Revenue by Portfolio Company" description="AI-attributed revenue ($M)">

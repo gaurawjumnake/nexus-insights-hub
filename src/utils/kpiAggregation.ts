@@ -74,13 +74,26 @@ export function aggregatePortfolio(
 ): Record<string, NormalisedKpi> {
   const buckets = new Map<string, RawKpi[]>()
   for (const list of Object.values(perCompany)) {
+    // Deduplicate: pick one row per KPI per company (prefer the requested period,
+    // else the lexicographically latest period). Without this, summing KPIs for
+    // a company that has multi-period data multiplies the value by period count.
+    const byKpi = new Map<string, RawKpi[]>()
     for (const raw of list) {
-      // skip nulls and errored statuses
       if (raw.value === null) continue
       if (typeof raw.status === 'string' && raw.status.startsWith('error')) continue
       if (typeof raw.status === 'string' && raw.status === 'insufficient_data') continue
-      if (!buckets.has(raw.kpi_id)) buckets.set(raw.kpi_id, [])
-      buckets.get(raw.kpi_id)!.push(raw)
+      const bucket = byKpi.get(raw.kpi_id)
+      if (bucket) bucket.push(raw)
+      else byKpi.set(raw.kpi_id, [raw])
+    }
+    for (const [kpiId, rows] of byKpi.entries()) {
+      const best =
+        (period ? rows.find((r) => r.period === period) : undefined) ??
+        rows.sort((a, b) => (b.period ?? '').localeCompare(a.period ?? ''))[0]
+      if (!best) continue
+      const existing = buckets.get(kpiId)
+      if (existing) existing.push(best)
+      else buckets.set(kpiId, [best])
     }
   }
 
