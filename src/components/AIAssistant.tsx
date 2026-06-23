@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Bot, Send, X, ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Bot, Send, X, ChevronRight, ChevronLeft, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buildApiUrl } from "@/config/api";
 import { setAiCollapsed } from "@/lib/ai-assistant-state";
@@ -13,12 +13,22 @@ export function addAiContext(label: string) {
   window.dispatchEvent(new CustomEvent(AI_CONTEXT_EVENT, { detail: label }));
 }
 
+const MIN_WIDTH = 360;
+const MAX_WIDTH_RATIO = 0.5; // up to half the screen
+
+function generateSessionId() {
+  return `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+}
+
 export function AIAssistant() {
   const [collapsed, setCollapsedState] = useState(false);
   const setCollapsed = (v: boolean) => {
     setCollapsedState(v);
     setAiCollapsed(v);
   };
+
+  const sessionId = useRef(generateSessionId());
+
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
@@ -29,7 +39,14 @@ export function AIAssistant() {
   const [input, setInput] = useState("");
   const [contexts, setContexts] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Resize state
+  const [width, setWidth] = useState(360);
+  const isResizing = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(0);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -46,6 +63,53 @@ export function AIAssistant() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
 
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizing.current = true;
+    startX.current = e.clientX;
+    startWidth.current = width;
+
+    const onMove = (ev: MouseEvent) => {
+      if (!isResizing.current) return;
+      const delta = startX.current - ev.clientX;
+      const maxWidth = Math.floor(window.innerWidth * MAX_WIDTH_RATIO);
+      const newWidth = Math.min(maxWidth, Math.max(MIN_WIDTH, startWidth.current + delta));
+      setWidth(newWidth);
+    };
+
+    const onUp = () => {
+      isResizing.current = false;
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [width]);
+
+  const clearChat = async () => {
+    if (clearing) return;
+    setClearing(true);
+    try {
+      await fetch(buildApiUrl(`/chat/history/${sessionId.current}`), {
+        method: "DELETE",
+      });
+    } catch {
+      // Best-effort — clear UI regardless
+    } finally {
+      sessionId.current = generateSessionId();
+      setMessages([
+        {
+          role: "assistant",
+          content:
+            "Hi! I'm your Nexus AI Assistant. Ask me about KPIs, portfolio companies, or click a KPI card to add it as context.",
+        },
+      ]);
+      setContexts([]);
+      setClearing(false);
+    }
+  };
+
   const send = async () => {
     const text = input.trim();
     if (!text || sending) return;
@@ -59,7 +123,7 @@ export function AIAssistant() {
       const res = await fetch(buildApiUrl("/chat/ask"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMsg.content, contexts }),
+        body: JSON.stringify({ message: userMsg.content, contexts, session_id: sessionId.current }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json().catch(() => ({}) as any);
@@ -76,7 +140,6 @@ export function AIAssistant() {
         },
       ]);
     } catch {
-      // Mock fallback
       setMessages((m) => [
         ...m,
         {
@@ -109,21 +172,39 @@ export function AIAssistant() {
 
   return (
     <aside
-      className="fixed right-0 top-0 z-40 h-screen w-[360px] bg-white border-l border-slate-200 shadow-sm flex flex-col"
-      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+      className="fixed right-0 top-0 z-40 h-screen bg-white border-l border-slate-200 shadow-sm flex flex-col"
+      style={{ width, fontFamily: "Inter, system-ui, sans-serif" }}
     >
+      {/* Drag handle on the left edge */}
+      <div
+        onMouseDown={onMouseDown}
+        className="absolute left-0 top-0 h-full w-1 cursor-col-resize hover:bg-teal-400/50 transition-colors z-10"
+        aria-hidden="true"
+      />
+
       <div className="h-12 flex items-center justify-between border-b border-slate-200 px-3">
         <div className="flex items-center gap-2 text-slate-700">
           <Bot className="h-4 w-4 text-teal-600" />
           <span className="text-[12px] font-semibold tracking-wide">AI ASSISTANT</span>
         </div>
-        <button
-          onClick={() => setCollapsed(true)}
-          className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-          aria-label="Collapse AI Assistant"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={clearChat}
+            disabled={clearing}
+            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-red-500 disabled:opacity-40"
+            aria-label="Clear chat"
+            title="Clear chat history"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setCollapsed(true)}
+            className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            aria-label="Collapse AI Assistant"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">

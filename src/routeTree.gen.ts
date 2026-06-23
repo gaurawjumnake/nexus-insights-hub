@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as UploadRouteImport } from './routes/upload'
+import { Route as RegistryRouteImport } from './routes/registry'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
@@ -24,6 +25,8 @@ import { Route as WorkforceDataManagementRouteImport } from './routes/workforce.
 import { Route as WorkforceBusinessRouteImport } from './routes/workforce.business'
 import { Route as WorkforceAiAdoptionRouteImport } from './routes/workforce.ai-adoption'
 import { Route as WorkforceAgentCenterRouteImport } from './routes/workforce.agent-center'
+import { Route as RegistryAddKpiRouteImport } from './routes/registry.add-kpi'
+import { Route as RegistryAddFactRouteImport } from './routes/registry.add-fact'
 
 const WorkforceRoute = WorkforceRouteImport.update({
   id: '/workforce',
@@ -33,6 +36,11 @@ const WorkforceRoute = WorkforceRouteImport.update({
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistryRoute = RegistryRouteImport.update({
+  id: '/registry',
+  path: '/registry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -101,12 +109,25 @@ const WorkforceAgentCenterRoute = WorkforceAgentCenterRouteImport.update({
   path: '/agent-center',
   getParentRoute: () => WorkforceRoute,
 } as any)
+const RegistryAddKpiRoute = RegistryAddKpiRouteImport.update({
+  id: '/add-kpi',
+  path: '/add-kpi',
+  getParentRoute: () => RegistryRoute,
+} as any)
+const RegistryAddFactRoute = RegistryAddFactRouteImport.update({
+  id: '/add-fact',
+  path: '/add-fact',
+  getParentRoute: () => RegistryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/compare': typeof CompareRoute
+  '/registry': typeof RegistryRouteWithChildren
   '/upload': typeof UploadRoute
   '/workforce': typeof WorkforceRouteWithChildren
+  '/registry/add-fact': typeof RegistryAddFactRoute
+  '/registry/add-kpi': typeof RegistryAddKpiRoute
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
@@ -122,7 +143,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/compare': typeof CompareRoute
+  '/registry': typeof RegistryRouteWithChildren
   '/upload': typeof UploadRoute
+  '/registry/add-fact': typeof RegistryAddFactRoute
+  '/registry/add-kpi': typeof RegistryAddKpiRoute
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
@@ -139,8 +163,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/compare': typeof CompareRoute
+  '/registry': typeof RegistryRouteWithChildren
   '/upload': typeof UploadRoute
   '/workforce': typeof WorkforceRouteWithChildren
+  '/registry/add-fact': typeof RegistryAddFactRoute
+  '/registry/add-kpi': typeof RegistryAddKpiRoute
   '/workforce/agent-center': typeof WorkforceAgentCenterRoute
   '/workforce/ai-adoption': typeof WorkforceAiAdoptionRoute
   '/workforce/business': typeof WorkforceBusinessRoute
@@ -158,8 +185,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/compare'
+    | '/registry'
     | '/upload'
     | '/workforce'
+    | '/registry/add-fact'
+    | '/registry/add-kpi'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
     | '/workforce/business'
@@ -175,7 +205,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/compare'
+    | '/registry'
     | '/upload'
+    | '/registry/add-fact'
+    | '/registry/add-kpi'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
     | '/workforce/business'
@@ -191,8 +224,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/compare'
+    | '/registry'
     | '/upload'
     | '/workforce'
+    | '/registry/add-fact'
+    | '/registry/add-kpi'
     | '/workforce/agent-center'
     | '/workforce/ai-adoption'
     | '/workforce/business'
@@ -209,6 +245,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CompareRoute: typeof CompareRoute
+  RegistryRoute: typeof RegistryRouteWithChildren
   UploadRoute: typeof UploadRoute
   WorkforceRoute: typeof WorkforceRouteWithChildren
 }
@@ -227,6 +264,13 @@ declare module '@tanstack/react-router' {
       path: '/upload'
       fullPath: '/upload'
       preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registry': {
+      id: '/registry'
+      path: '/registry'
+      fullPath: '/registry'
+      preLoaderRoute: typeof RegistryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -320,8 +364,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkforceAgentCenterRouteImport
       parentRoute: typeof WorkforceRoute
     }
+    '/registry/add-kpi': {
+      id: '/registry/add-kpi'
+      path: '/add-kpi'
+      fullPath: '/registry/add-kpi'
+      preLoaderRoute: typeof RegistryAddKpiRouteImport
+      parentRoute: typeof RegistryRoute
+    }
+    '/registry/add-fact': {
+      id: '/registry/add-fact'
+      path: '/add-fact'
+      fullPath: '/registry/add-fact'
+      preLoaderRoute: typeof RegistryAddFactRouteImport
+      parentRoute: typeof RegistryRoute
+    }
   }
 }
+
+interface RegistryRouteChildren {
+  RegistryAddFactRoute: typeof RegistryAddFactRoute
+  RegistryAddKpiRoute: typeof RegistryAddKpiRoute
+}
+
+const RegistryRouteChildren: RegistryRouteChildren = {
+  RegistryAddFactRoute: RegistryAddFactRoute,
+  RegistryAddKpiRoute: RegistryAddKpiRoute,
+}
+
+const RegistryRouteWithChildren = RegistryRoute._addFileChildren(
+  RegistryRouteChildren,
+)
 
 interface WorkforceRouteChildren {
   WorkforceAgentCenterRoute: typeof WorkforceAgentCenterRoute
@@ -358,6 +430,7 @@ const WorkforceRouteWithChildren = WorkforceRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CompareRoute: CompareRoute,
+  RegistryRoute: RegistryRouteWithChildren,
   UploadRoute: UploadRoute,
   WorkforceRoute: WorkforceRouteWithChildren,
 }

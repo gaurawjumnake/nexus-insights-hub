@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ChevronDown,
   Layers,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ApiHealthIndicator } from "@/components/ApiHealthIndicator";
@@ -40,6 +41,11 @@ const COMPARATIVE_NAV: NavItem[] = [
   { to: "/workforce/portfolio", label: "Portfolio", icon: LayoutDashboard },
 ];
 
+const REGISTRY_NAV: NavItem[] = [
+  { to: "/registry/add-fact", label: "Add Fact", icon: Archive },
+  { to: "/registry/add-kpi", label: "Add KPI", icon: Archive },
+];
+
 const BOTTOM_NAV: NavItem[] = [
   { to: "/upload", label: "Upload Documents", icon: Upload },
 ];
@@ -56,8 +62,13 @@ export function RightSidebar() {
     () => COMPARATIVE_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
     [pathname],
   );
+  const registryActive = useMemo(
+    () => REGISTRY_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
+    [pathname],
+  );
   const [personasOpen, setPersonasOpen] = useState(true);
   const [comparativeOpen, setComparativeOpen] = useState(true);
+  const [registryOpen, setRegistryOpen] = useState(true);
 
   const renderItem = (item: NavItem, opts?: { nested?: boolean }) => {
     const Icon = item.icon;
@@ -163,6 +174,34 @@ export function RightSidebar() {
         </button>
         {(comparativeOpen || collapsed) &&
           COMPARATIVE_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
+
+        {/* Registry collapsible group */}
+        <button
+          type="button"
+          onClick={() => setRegistryOpen((o) => !o)}
+          className={cn(
+            "w-[calc(100%-1rem)] mx-2 my-0.5 flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] transition-colors",
+            registryActive
+              ? "text-teal-700 font-semibold"
+              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+          )}
+          aria-expanded={registryOpen}
+          title="Registry"
+        >
+          <Archive className="w-4 h-4 shrink-0" />
+          {!collapsed && (
+            <>
+              <span className="truncate flex-1 text-left">Registry</span>
+              {registryOpen ? (
+                <ChevronDown className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronRight className="w-3.5 h-3.5" />
+              )}
+            </>
+          )}
+        </button>
+        {(registryOpen || collapsed) &&
+          REGISTRY_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
 
         {BOTTOM_NAV.map((item) => renderItem(item))}
       </nav>

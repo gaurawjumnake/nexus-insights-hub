@@ -92,6 +92,7 @@ const SCORE_100_KEYS = new Set([
   'portfolio_ai_adoption_score',
   'top_quartile_position',
   'governance_rank',
+  'portfolio_benchmark_score',
 ])
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -125,6 +126,12 @@ function formatDisplay(id: string, value: number): string {
 
   // Latency — milliseconds
   if (id === 'p95_latency') return `${Math.round(value)} ms`
+
+  // Mean time to resolve — minutes
+  if (id === 'mttr') return `${value.toFixed(1)} min`
+
+  // Incident rate — round to 1 decimal
+  if (id === 'ai_incident_rate') return value.toFixed(1)
 
   // Payback period — months
   if (id === 'payback_period') return `${value.toFixed(1)} mo`

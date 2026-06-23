@@ -1,13 +1,13 @@
 {
-  "mcpServers": {
-    "code-review-graph": {
-      "command": "uvx",
-      "args": [
-        "code-review-graph",
-        "serve"
-      ],
-      "cwd": "D:\\ai observability tower fe",
-      "type": "stdio"
+    "mcpServers": {
+        "code-review-graph": {
+            "command": "uvx",
+            "args": [
+                "code-review-graph",
+                "serve"
+            ],
+            "cwd": "D:\\ai observability tower fe",
+            "type": "stdio"
+        }
     }
-  }
 }

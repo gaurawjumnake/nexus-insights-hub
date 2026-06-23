@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import {
   Activity,
   TrendingUp,
@@ -7,17 +7,55 @@ import {
   Users,
   Zap,
   Download,
+  Loader2,
   Plus,
   Trash2,
   Globe,
   BarChart3,
   Info,
-  ArrowRight,
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePortfolioKpis, selectContextKpis } from "@/hooks/usePortfolioKpis";
 import { kpi as kpiOf } from "@/lib/normaliseKpi";
+import { generateDashboardPdf } from "@/lib/generateDashboardPdf";
+
+// KPI catalog for comparative analysis (mirrors compare.tsx)
+const COMPARE_KPIS = {
+  cxo: [
+    { id: "ai_revenue",                   label: "AI Revenue",          category: "Value" },
+    { id: "ebitda_uplift",                label: "EBITDA Uplift",       category: "Value" },
+    { id: "ai_roi",                       label: "AI ROI",              category: "Value" },
+    { id: "cost_savings",                 label: "Cost Savings",        category: "Value" },
+    { id: "ai_maturity_score",            label: "AI Maturity Score",   category: "Maturity" },
+    { id: "portfolio_ai_adoption_score",  label: "AI Adoption Score",   category: "Maturity" },
+    { id: "ai_governance_score",          label: "Governance Score",    category: "Risk" },
+    { id: "total_ai_spend",               label: "Total AI Spend",      category: "Cost", lowerIsBetter: true },
+  ],
+  business: [
+    { id: "direct_ai_revenue",            label: "Direct AI Revenue",   category: "Revenue" },
+    { id: "ai_assisted_revenue",          label: "AI-Assisted Revenue", category: "Revenue" },
+    { id: "productivity_gain",            label: "Productivity Gain",   category: "Efficiency" },
+    { id: "cost_per_outcome",             label: "Cost per Outcome",    category: "Efficiency", lowerIsBetter: true },
+    { id: "industry_benchmark_ratio",     label: "Industry Benchmark",  category: "Benchmark" },
+  ],
+  technology: [
+    { id: "availability_uptime",          label: "Platform Uptime",     category: "Platform" },
+    { id: "error_rate",                   label: "Error Rate",          category: "Platform", lowerIsBetter: true },
+    { id: "percent_ai_in_production",     label: "% AI in Production",  category: "Models" },
+    { id: "cloud_spend",                  label: "Cloud Spend",         category: "FinOps",  lowerIsBetter: true },
+    { id: "technical_maturity_score",     label: "Tech Maturity",       category: "Maturity" },
+    { id: "data_privacy_compliance",      label: "Data Privacy",        category: "Risk" },
+  ],
+  operations: [
+    { id: "total_ai_projects",            label: "Total AI Projects" },
+    { id: "projects_in_production",       label: "In Production" },
+    { id: "active_ai_users",              label: "Active AI Users" },
+    { id: "budget_adherence",             label: "Budget Adherence" },
+    { id: "human_review_coverage",        label: "Human Review Coverage" },
+    { id: "policy_compliance_rate",       label: "Policy Compliance" },
+  ],
+} as const;
 
 export const Route = createFileRoute("/")({
   // KPI data is fetched client-side and the backend base URL is configurable
@@ -762,12 +800,22 @@ const TILE_TITLE_TO_KPI: Record<string, string> = {
   "Forecasted AI Spend": "forecasted_ai_spend",
   "Budget Adherence": "budget_adherence",
   "Error Rate": "error_rate",
+  "AI Incident Management": "critical_incident_count",
+  "AI Incidents (MTD)": "ai_incident_rate",
+  "AI Incidents (Critical)": "critical_incident_count",
+  "AI Projects Portfolio": "total_ai_projects",
+  "Latency (P95)": "p95_latency",
+  "MTTR (Incident Response)": "mttr",
+  "Industry Comparison": "industry_benchmark_ratio",
+  "Portfolio Ranking": "portfolio_benchmark_score",
+  "Top Quartile": "top_quartile_position",
 };
 
 function NexusDashboard() {
   const [persona, setPersona] = useState<Persona>("cxo");
   const [subTab, setSubTab] = useState<SubTab>("all");
   const [contextId, setContextId] = useState<string>("all");
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const portfolio = usePortfolioKpis();
   const activeKpis = useMemo(
@@ -782,6 +830,34 @@ function NexusDashboard() {
       tiles: subTab === "all" ? s.tiles : s.tiles.filter((t) => t.category === subTab),
     }))
     .filter((s) => s.tiles.length > 0);
+
+  const handleDownload = useCallback(async () => {
+    setIsDownloading(true);
+    try {
+      const contextLabel =
+        contextId === "all"
+          ? "All Portfolio"
+          : portfolio.companies.find((c) => c.id === contextId)?.label ?? contextId;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await generateDashboardPdf({
+        contextLabel,
+        summaryKpiDefs: SUMMARY_DEFS.map(({ label, kpiId }) => ({ label, kpiId })),
+        activeKpis,
+        // TILES and COMPARE_KPIS share the same structural shape as the
+        // PDF utility's internal types (superset). Cast via unknown to avoid
+        // verbose re-declaration of the full tile union.
+        personaSections: TILES as unknown as Parameters<typeof generateDashboardPdf>[0]["personaSections"],
+        tileKpiMap: TILE_TITLE_TO_KPI,
+        companies: portfolio.companies,
+        perCompany: portfolio.perCompany,
+        kpisByPersona: COMPARE_KPIS as unknown as Parameters<typeof generateDashboardPdf>[0]["kpisByPersona"],
+        kpiDisplayFn: (map, id, fallback) => kpiOf(map, id, fallback),
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [contextId, portfolio, activeKpis]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -824,13 +900,22 @@ function NexusDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50">
-              <Download className="h-4 w-4" />
-              Download Dashboard
-            </button>
-            <button className="flex items-center gap-2 rounded-md bg-teal-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-600">
-              <Plus className="h-4 w-4" />
-              Add KPI
+            <button
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className={cn(
+                "flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
+                isDownloading
+                  ? "border-teal-200 bg-teal-50 text-teal-600 cursor-not-allowed"
+                  : "border-slate-200 hover:bg-slate-50",
+              )}
+            >
+              {isDownloading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {isDownloading ? "Generating PDF…" : "Download Dashboard"}
             </button>
             <div className="h-9 w-9 rounded-full bg-gradient-to-br from-teal-400 to-blue-500" />
           </div>
@@ -931,14 +1016,6 @@ function NexusDashboard() {
               );
             })}
           </nav>
-          <Link
-            to={(persona === "business" ? "/workforce/business" : persona === "technology" ? "/workforce/technology" : persona === "operations" ? "/workforce/operations" : "/workforce") as "/workforce"}
-            search={{ persona } as never}
-            className="mb-2 inline-flex items-center gap-1.5 rounded-md bg-gradient-to-r from-indigo-500 to-teal-500 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-600 hover:to-teal-600"
-          >
-            View Detail Insights ({PERSONAS.find((p) => p.id === persona)?.label})
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
         </div>
 
         {/* Sections */}
