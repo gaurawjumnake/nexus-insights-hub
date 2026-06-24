@@ -19,7 +19,7 @@ const LEGACY_STORAGE_KEY = 'nexus.apiBaseUrl'
 const DEFAULT_URL =
   (typeof import.meta !== 'undefined' &&
     (import.meta as ImportMeta).env?.VITE_API_BASE_URL) ||
-  'http://localhost:8005'
+  'https://ch3lr5e5g7.execute-api.ap-southeast-2.amazonaws.com'
 
 export const API_BASE_URL_EVENT = 'nexus:api-base-url-changed'
 
