@@ -133,7 +133,7 @@ function UploadPage() {
             </div>
             <div>
               <label className="block text-[12px] font-medium text-slate-700 mb-1">
-                Persona <span className="text-rose-500">*</span>
+                Period <span className="text-rose-500">*</span>
               </label>
               <input
                 value={period}
