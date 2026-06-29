@@ -6,6 +6,34 @@ import { setAiCollapsed } from "@/lib/ai-assistant-state";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+function parseInline(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  const regex = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`/g;
+  let last = 0, key = 0, m: RegExpExecArray | null;
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    if (m[1]) parts.push(<strong key={key++}>{m[1]}</strong>);
+    else if (m[2]) parts.push(<em key={key++}>{m[2]}</em>);
+    else if (m[3]) parts.push(<code key={key++} className="rounded bg-slate-200 px-1 font-mono text-[11px]">{m[3]}</code>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
+function renderMarkdown(text: string): React.ReactNode {
+  return text.split("\n").map((line, i) => {
+    const bullet = /^[-*] /.test(line);
+    const raw = bullet ? line.slice(2) : line;
+    return (
+      <span key={i} className="block">
+        {bullet && <span className="mr-1.5">•</span>}
+        {parseInline(raw)}
+      </span>
+    );
+  });
+}
+
 export const AI_CONTEXT_EVENT = "ai-assistant:add-context";
 
 export function addAiContext(label: string) {
@@ -212,13 +240,13 @@ export function AIAssistant() {
           <div
             key={i}
             className={cn(
-              "max-w-[90%] rounded-lg px-3 py-2 text-[13px] leading-relaxed whitespace-pre-wrap",
+              "max-w-[90%] rounded-lg px-3 py-2 text-[13px] leading-relaxed",
               m.role === "user"
-                ? "ml-auto bg-teal-600 text-white"
+                ? "ml-auto bg-teal-600 text-white whitespace-pre-wrap"
                 : "bg-slate-100 text-slate-800",
             )}
           >
-            {m.content}
+            {m.role === "assistant" ? renderMarkdown(m.content) : m.content}
           </div>
         ))}
         {sending && (

@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useBlocker } from "@tanstack/react-router";
 import { useState, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Upload as UploadIcon,
   FileText,
@@ -8,8 +7,8 @@ import {
   AlertCircle,
   Loader2,
   Trash2,
+  Clock,
 } from "lucide-react";
-import { kpiKeys } from "@/hooks/useKpis";
 import { buildApiUrl } from "@/config/api";
 
 export const Route = createFileRoute("/upload")({
@@ -26,9 +25,9 @@ type UploadedDoc = {
   id: string;
   name: string;
   size: number;
-  status: "uploading" | "success" | "error";
+  file: File;
+  status: "pending" | "uploading" | "success" | "error";
   message?: string;
-  response?: unknown;
 };
 
 function UploadPage() {
@@ -36,11 +35,8 @@ function UploadPage() {
   const [period, setPeriod] = useState("");
   const [docs, setDocs] = useState<UploadedDoc[]>([]);
   const [dragging, setDragging] = useState(false);
-  const [calculating, setCalculating] = useState(false);
-  const [calcMessage, setCalcMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ companyId?: string; period?: string }>({});
   const inputRef = useRef<HTMLInputElement>(null);
-  const queryClient = useQueryClient();
 
   function validateContext() {
     const next: { companyId?: string; period?: string } = {};
@@ -50,86 +46,62 @@ function UploadPage() {
     return Object.keys(next).length === 0;
   }
 
-  async function uploadFile(file: File) {
-    const id = crypto.randomUUID();
-    setDocs((d) => [
-      ...d,
-      { id, name: file.name, size: file.size, status: "uploading" },
-    ]);
+  function stageFiles(files: FileList | null) {
+    if (!files) return;
+    const incoming: UploadedDoc[] = Array.from(files).map((file) => ({
+      id: crypto.randomUUID(),
+      name: file.name,
+      size: file.size,
+      file,
+      status: "pending",
+    }));
+    setDocs((d) => [...d, ...incoming]);
+  }
 
+  async function uploadDoc(doc: UploadedDoc) {
+    setDocs((d) => d.map((x) => (x.id === doc.id ? { ...x, status: "uploading" } : x)));
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", doc.file);
     fd.append("company_id", companyId);
     fd.append("period", period);
-
     try {
-      const res = await fetch(buildApiUrl("/documents/upload"), {
-        method: "POST",
-        body: fd,
-      });
+      const res = await fetch(buildApiUrl("/documents/upload"), { method: "POST", body: fd });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body?.detail || `Upload failed [${res.status}]`);
       setDocs((d) =>
-        d.map((doc) =>
-          doc.id === id
-            ? { ...doc, status: "success", message: "Parsed & ingested", response: body }
-            : doc,
-        ),
+        d.map((x) => (x.id === doc.id ? { ...x, status: "success", message: "Parsed & ingested" } : x))
       );
     } catch (err) {
       setDocs((d) =>
-        d.map((doc) =>
-          doc.id === id
-            ? { ...doc, status: "error", message: (err as Error).message }
-            : doc,
-        ),
+        d.map((x) => (x.id === doc.id ? { ...x, status: "error", message: (err as Error).message } : x))
       );
     }
   }
 
-  function handleFiles(files: FileList | null) {
-    if (!files) return;
-    Array.from(files).forEach(uploadFile);
+  async function handleUpload() {
+    if (!validateContext()) return;
+    const pending = docs.filter((d) => d.status === "pending");
+    if (!pending.length) return;
+    await Promise.all(pending.map(uploadDoc));
   }
 
-  async function runCalculation() {
-    setCalculating(true);
-    setCalcMessage(null);
-    try {
-      const res = await fetch(buildApiUrl("/kpis/calculate"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company_id: companyId, period: period }),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.detail || `Calculate failed [${res.status}]`);
-      await queryClient.invalidateQueries({ queryKey: kpiKeys.all });
-      setCalcMessage("KPIs recalculated. All dashboards refreshed.");
-    } catch (err) {
-      setCalcMessage((err as Error).message);
-    } finally {
-      setCalculating(false);
-    }
-  }
+  const pendingCount = docs.filter((d) => d.status === "pending").length;
+  const uploading = docs.some((d) => d.status === "uploading");
 
-  const successCount = docs.filter((d) => d.status === "success").length;
+  const { proceed, reset, status } = useBlocker({
+    shouldBlockFn: () => uploading,
+    withResolver: true,
+  });
 
   return (
-    <div
-      className="min-h-screen bg-slate-50"
-      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-    >
+    <div className="min-h-screen bg-slate-50" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
       <div className="max-w-4xl mx-auto px-8 py-10">
         <div className="mb-8">
-          <h1
-            className="text-2xl font-bold text-slate-900"
-            style={{ fontFamily: "Outfit, sans-serif" }}
-          >
+          <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: "Outfit, sans-serif" }}>
             Upload Documents
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Drop PortCo board decks, financials, or AI program reports. They're parsed,
-            normalised, and fed into the KPI pipeline.
+            Drop PortCo board decks, financials, or AI program reports. They're parsed, normalised, and fed into the KPI pipeline.
           </p>
         </div>
 
@@ -184,20 +156,14 @@ function UploadPage() {
 
         {/* Dropzone */}
         <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            if (validateContext()) setDragging(true);
-          }}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => {
             e.preventDefault();
             setDragging(false);
-            if (!validateContext()) return;
-            handleFiles(e.dataTransfer.files);
+            stageFiles(e.dataTransfer.files);
           }}
-          onClick={() => {
-            if (validateContext()) inputRef.current?.click();
-          }}
+          onClick={() => inputRef.current?.click()}
           className={`rounded-xl border-2 border-dashed p-12 text-center cursor-pointer transition-colors ${
             dragging
               ? "border-teal-500 bg-teal-50"
@@ -206,7 +172,7 @@ function UploadPage() {
         >
           <UploadIcon className="w-10 h-10 mx-auto mb-3 text-teal-500" />
           <div className="text-sm font-semibold text-slate-900">
-            Drop files here or click to browse
+            Drag and drop documents or click to upload
           </div>
           <div className="text-[12px] text-slate-500 mt-1">
             PDF, DOCX, XLSX, PPTX, CSV — parsed via LlamaCloud
@@ -216,32 +182,17 @@ function UploadPage() {
             type="file"
             multiple
             className="hidden"
-            onChange={(e) => handleFiles(e.target.files)}
+            onChange={(e) => stageFiles(e.target.files)}
             accept=".pdf,.docx,.xlsx,.pptx,.csv,.txt,.md"
           />
         </div>
-
-        {/* Upload button */}
-        <div className="mt-3 flex justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              if (validateContext()) inputRef.current?.click();
-            }}
-            className="px-4 py-2 rounded-md bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 flex items-center gap-2"
-          >
-            <UploadIcon className="w-4 h-4" />
-            Upload
-          </button>
-        </div>
-
 
         {/* File list */}
         {docs.length > 0 && (
           <div className="mt-6 bg-white border border-slate-200 rounded-xl overflow-hidden">
             <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
               <div className="text-[11px] font-semibold tracking-[0.12em] text-slate-400">
-                UPLOADS ({docs.length})
+                DOCUMENTS ({docs.length})
               </div>
               <button
                 onClick={() => setDocs([])}
@@ -261,47 +212,59 @@ function UploadPage() {
                       {d.message && ` · ${d.message}`}
                     </div>
                   </div>
-                  {d.status === "uploading" && (
-                    <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />
-                  )}
-                  {d.status === "success" && (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  )}
-                  {d.status === "error" && (
-                    <AlertCircle className="w-4 h-4 text-rose-500" />
-                  )}
+                  {d.status === "pending" && <Clock className="w-4 h-4 text-slate-400" />}
+                  {d.status === "uploading" && <Loader2 className="w-4 h-4 text-teal-500 animate-spin" />}
+                  {d.status === "success" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                  {d.status === "error" && <AlertCircle className="w-4 h-4 text-rose-500" />}
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Calculate */}
-        <div className="mt-6 bg-white border border-slate-200 rounded-xl p-5 flex items-center justify-between">
-          <div>
-            <div className="text-sm font-semibold text-slate-900">
-              Recalculate KPIs
-            </div>
-            <div className="text-[12px] text-slate-500 mt-0.5">
-              Trigger the pipeline for <span className="font-mono">{companyId}</span> ·{" "}
-              <span className="font-mono">{period}</span>. {successCount} document
-              {successCount === 1 ? "" : "s"} ready.
-            </div>
-            {calcMessage && (
-              <div className="text-[12px] text-teal-700 mt-1.5">{calcMessage}</div>
-            )}
+        {/* Upload button */}
+        {pendingCount > 0 && (
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={handleUpload}
+              disabled={uploading}
+              className="px-4 py-2 rounded-md bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadIcon className="w-4 h-4" />}
+              {uploading ? "Uploading…" : `Upload ${pendingCount} file${pendingCount === 1 ? "" : "s"}`}
+            </button>
           </div>
-          <button
-            onClick={runCalculation}
-            disabled={calculating}
-            className="px-4 py-2 rounded-md bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {calculating && <Loader2 className="w-4 h-4 animate-spin" />}
-            {calculating ? "Running…" : "Run Pipeline"}
-          </button>
-        </div>
-
+        )}
       </div>
+
+      {/* Navigation-block dialog */}
+      {status === "blocked" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="text-sm font-semibold text-slate-900 mb-2">
+              Upload in progress
+            </div>
+            <p className="text-sm text-slate-500 mb-5">
+              Switching screens while uploading documents may stop the process. Do you want to continue?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={reset}
+                className="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200"
+              >
+                Stay
+              </button>
+              <button
+                onClick={proceed}
+                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-rose-500 hover:bg-rose-600"
+              >
+                Leave anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
