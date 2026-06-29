@@ -42,9 +42,7 @@ export const kpiKeys = {
 
 async function fetchKpis(companyId: string, period: string): Promise<RawKpi[]> {
   const url = buildApiUrl(`/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`)
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-  })
+  const res = await fetch(url)
 
   if (!res.ok) {
     const body = await res.text().catch(() => '')

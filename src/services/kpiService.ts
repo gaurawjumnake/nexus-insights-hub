@@ -44,9 +44,7 @@ function extractKpiArray(data: unknown): RawKpi[] {
  * company list and (optionally) the KPI values themselves.
  */
 export async function getAllKpis(): Promise<RawKpi[]> {
-  const res = await fetch(buildApiUrl('/kpis/'), {
-    headers: { 'Content-Type': 'application/json' },
-  })
+  const res = await fetch(buildApiUrl('/kpis/'))
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     throw new Error(`KPI list fetch failed [${res.status}]: ${body}`)
@@ -94,9 +92,7 @@ export async function getCompanyKPIs(
   period: string = DEFAULT_PERIOD,
 ): Promise<RawKpi[]> {
   const url = buildApiUrl(`/kpis/${encodeURIComponent(companyId)}/${encodeURIComponent(period)}`)
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
-  })
+  const res = await fetch(url)
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     throw new Error(`KPI fetch failed [${res.status}]: ${body}`)

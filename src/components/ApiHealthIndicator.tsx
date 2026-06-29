@@ -1,3 +1,4 @@
+import { RefreshCw } from "lucide-react";
 import { useApiHealth, type ApiHealthStatus } from "@/hooks/useApiHealth";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +31,7 @@ function formatTime(ts: number) {
 }
 
 export function ApiHealthIndicator({ collapsed }: { collapsed?: boolean }) {
-  const { data, isLoading } = useApiHealth();
+  const { data, isLoading, isFetching, refetch } = useApiHealth();
   const status: ApiHealthStatus = data?.status ?? "offline";
   const meta = META[status];
 
@@ -69,6 +70,17 @@ export function ApiHealthIndicator({ collapsed }: { collapsed?: boolean }) {
           ? `Last checked: ${formatTime(data.checkedAt)}`
           : "Last checked: —"}
       </div>
+      {status === "offline" && (
+        <button
+          type="button"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="mt-2 w-full inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-rose-200 text-rose-600 text-[11px] font-medium hover:bg-rose-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <RefreshCw className={cn("w-3 h-3", isFetching && "animate-spin")} />
+          {isFetching ? "Connecting…" : "Reconnect"}
+        </button>
+      )}
     </div>
   );
 }

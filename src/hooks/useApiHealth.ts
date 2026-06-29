@@ -19,31 +19,15 @@ async function probe(): Promise<ApiHealthResult> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
   try {
-    // Trailing slash matches this backend's real route (GET /kpis/) and
-    // avoids an extra 307-redirect round trip from the no-slash variant.
-    const res = await fetch(buildApiUrl('/kpis/'), {
-      headers: { 'Content-Type': 'application/json' },
+    // Use the dedicated /health endpoint — no Content-Type header on a GET
+    // (that triggers a CORS preflight which may fail on some backends).
+    const res = await fetch(buildApiUrl('/health'), {
       signal: controller.signal,
     })
-    if (res.status >= 500) {
+    if (!res.ok) {
       return { status: 'offline', checkedAt: Date.now() }
     }
-    if (!res.ok) {
-      return { status: 'empty', checkedAt: Date.now() }
-    }
-    const data = await res.json().catch(() => null)
-    const obj = data as { items?: unknown[]; kpis?: unknown[] } | null
-    const list: unknown[] = Array.isArray(data)
-      ? data
-      : Array.isArray(obj?.kpis)
-        ? obj.kpis
-        : Array.isArray(obj?.items)
-          ? obj.items
-          : []
-    return {
-      status: list.length > 0 ? 'connected' : 'empty',
-      checkedAt: Date.now(),
-    }
+    return { status: 'connected', checkedAt: Date.now() }
   } catch {
     return { status: 'offline', checkedAt: Date.now() }
   } finally {
@@ -64,8 +48,12 @@ export function useApiHealth() {
   return useQuery({
     queryKey: ['api-health'],
     queryFn: probe,
-    staleTime: 60 * 1000,
-    refetchInterval: 60 * 1000,
-    retry: 1,
+    staleTime: 30 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    // Retry aggressively when offline, back off once connected.
+    refetchInterval: (query) =>
+      query.state.data?.status === 'offline' ? 10_000 : 60_000,
+    retry: false,
   })
 }

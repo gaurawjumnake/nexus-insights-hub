@@ -10,7 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { kpiKeys } from "@/hooks/useKpis";
-import { buildApiUrl, getApiBaseUrl } from "@/config/api";
+import { buildApiUrl } from "@/config/api";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -33,19 +33,19 @@ type UploadedDoc = {
 
 function UploadPage() {
   const [companyId, setCompanyId] = useState("");
-  const [persona, setPersona] = useState("");
+  const [period, setPeriod] = useState("");
   const [docs, setDocs] = useState<UploadedDoc[]>([]);
   const [dragging, setDragging] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [calcMessage, setCalcMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<{ companyId?: string; persona?: string }>({});
+  const [errors, setErrors] = useState<{ companyId?: string; period?: string }>({});
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   function validateContext() {
-    const next: { companyId?: string; persona?: string } = {};
+    const next: { companyId?: string; period?: string } = {};
     if (!companyId.trim()) next.companyId = "Company ID is required";
-    if (!persona.trim()) next.persona = "Persona is required";
+    if (!period.trim()) next.period = "Persona is required";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -60,7 +60,7 @@ function UploadPage() {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("company_id", companyId);
-    fd.append("period", persona);
+    fd.append("period", period);
 
     try {
       const res = await fetch(buildApiUrl("/documents/upload"), {
@@ -99,7 +99,7 @@ function UploadPage() {
       const res = await fetch(buildApiUrl("/kpis/calculate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company_id: companyId, period: persona }),
+        body: JSON.stringify({ company_id: companyId, period: period }),
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body?.detail || `Calculate failed [${res.status}]`);
@@ -141,7 +141,7 @@ function UploadPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-medium text-slate-700 mb-1">
-                Company ID <span className="text-rose-500">*</span>
+                Company Name <span className="text-rose-500">*</span>
               </label>
               <input
                 value={companyId}
@@ -164,19 +164,19 @@ function UploadPage() {
                 Persona <span className="text-rose-500">*</span>
               </label>
               <input
-                value={persona}
+                value={period}
                 onChange={(e) => {
-                  setPersona(e.target.value);
-                  if (errors.persona) setErrors((p) => ({ ...p, persona: undefined }));
+                  setPeriod(e.target.value);
+                  if (errors.period) setErrors((p) => ({ ...p, period: undefined }));
                 }}
                 aria-required="true"
-                aria-invalid={!!errors.persona}
+                aria-invalid={!!errors.period}
                 className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                  errors.persona ? "border-rose-400" : "border-slate-200"
+                  errors.period ? "border-rose-400" : "border-slate-200"
                 }`}
               />
-              {errors.persona && (
-                <div className="text-[11px] text-rose-600 mt-1">{errors.persona}</div>
+              {errors.period && (
+                <div className="text-[11px] text-rose-600 mt-1">{errors.period}</div>
               )}
             </div>
           </div>
@@ -284,7 +284,7 @@ function UploadPage() {
             </div>
             <div className="text-[12px] text-slate-500 mt-0.5">
               Trigger the pipeline for <span className="font-mono">{companyId}</span> ·{" "}
-              <span className="font-mono">{persona}</span>. {successCount} document
+              <span className="font-mono">{period}</span>. {successCount} document
               {successCount === 1 ? "" : "s"} ready.
             </div>
             {calcMessage && (
@@ -301,9 +301,6 @@ function UploadPage() {
           </button>
         </div>
 
-        <div className="mt-6 text-[11px] text-slate-400">
-          API: <span className="font-mono">{getApiBaseUrl()}</span>
-        </div>
       </div>
     </div>
   );
