@@ -172,3 +172,82 @@ export async function getKpiTrend(
   }
   return res.json()
 }
+
+export interface TrendPortfoliosResponse {
+  company_ids: string[]
+  period_type: 'month' | 'quarter' | 'year'
+  start_period: string
+  end_period: string
+  results: Record<string, Record<string, TrendPeriodResult[]>>
+}
+
+/**
+ * POST /kpis/trend/portfolios → { results: { [company_id]: { [kpi_id]: TrendPeriodResult[] } } }
+ *
+ * Batches MoM/QoQ/YoY trend data for multiple portfolios (and KPIs) in a
+ * single request, replacing N per-portfolio /kpis/trend calls.
+ */
+export async function getKpiTrendPortfolios(
+  companyIds: string[],
+  kpiIds: string[],
+  periodType: 'month' | 'quarter' | 'year',
+  startPeriod: string,
+  endPeriod: string,
+): Promise<TrendPortfoliosResponse> {
+  const res = await fetch(buildApiUrl('/kpis/trend/portfolios'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      company_ids: companyIds,
+      kpi_ids: kpiIds,
+      period_type: periodType,
+      start_period: startPeriod,
+      end_period: endPeriod,
+    }),
+  })
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(`KPI trend (portfolios) fetch failed [${res.status}]: ${body}`)
+  }
+  return res.json()
+}
+
+// ─── Insights (LLM-generated narrative) ──────────────────────────────────
+
+export interface InsightsResponse {
+  company_id: string
+  period: string
+  report: string
+}
+
+/**
+ * POST /kpis/insights → { company_id, period, report }
+ *
+ * Scoped Q&A over one company's KPIs — NOT a portfolio-wide feed. `report`
+ * is free-form markdown from an LLM and is latency-bound (~15s observed),
+ * so callers must show a loading state rather than treating a slow
+ * response as an error. A 500 with { detail } is a genuine failure
+ * (e.g. bad company_id) and should surface to the user.
+ */
+export async function getKpiInsights(
+  companyId: string,
+  period: string,
+  kpiIds: string[],
+  question: string,
+): Promise<InsightsResponse> {
+  const res = await fetch(buildApiUrl('/kpis/insights'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question,
+      company_id: companyId,
+      period,
+      kpi_ids: kpiIds,
+    }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    throw new Error(body?.detail || `Insights fetch failed [${res.status}]`)
+  }
+  return res.json()
+}

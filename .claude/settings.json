@@ -1,4 +1,26 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(git stash *)",
+      "Bash(curl -s -X POST http://localhost:8005/kpis/trend/portfolios -H \"Content-Type: application/json\" -d '{\"company_ids\":[\"fluke\",\"gordian\"],\"kpi_ids\":[\"ai_revenue\"],\"period_type\":\"quarter\",\"start_period\":\"2025-Q1\",\"end_period\":\"2026-Q2\"}')",
+      "Bash(curl -s -X POST http://localhost:8005/kpis/trend/portfolios -H \"Content-Type: application/json\" -d '{\"company_ids\":[\"fluke\",\"gordian\"],\"kpi_ids\":[\"ai_revenue\"],\"period_type\":\"year\",\"start_period\":\"2024\",\"end_period\":\"2026\"}')",
+      "Bash(curl -s -X POST http://localhost:8005/kpis/trend/portfolios -H \"Content-Type: application/json\" -d '{\"company_ids\":[\"fluke\",\"gordian\"],\"kpi_ids\":[\"ai_revenue\"],\"period_type\":\"quarter\",\"start_period\":\"2025-Q4\",\"end_period\":\"2026-Q3\"}')",
+      "Bash(curl -s \"http://localhost:8005/kpis/\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -X POST http://localhost:8005/kpis/trend/portfolios -H \"Content-Type: application/json\" -d '{\"company_ids\":[\"fluke\",\"gordian\",\"novamind\",\"provation\"],\"kpi_ids\":[\"ai_revenue\"],\"period_type\":\"quarter\",\"start_period\":\"2025-Q4\",\"end_period\":\"2026-Q3\"}')",
+      "Bash(curl -s -X POST http://localhost:8005/kpis/trend/portfolios -H \"Content-Type: application/json\" -d '{\"company_ids\":[\"fluke\",\"gordian\",\"novamind\",\"provation\"],\"kpi_ids\":[\"ai_revenue\"],\"period_type\":\"year\",\"start_period\":\"2024\",\"end_period\":\"2026\"}')",
+      "Bash(chromium-cli --help)",
+      "Bash(cd \"d:/ai observability tower fe\" && cat package.json | grep -i playwright; find / -iname \"playwright*\" -maxdepth 4 2>/dev/null | head -5)",
+      "Read(//d//**)",
+      "Bash(curl -s -X POST http://localhost:8005/kpis/trend/portfolios -H \"Content-Type: application/json\" -d '{\"company_ids\":[\"fluke\",\"gordian\",\"novamind\",\"provation\"],\"kpi_ids\":[\"ai_revenue\"],\"period_type\":\"month\",\"start_period\":\"2025-08\",\"end_period\":\"2026-07\"}')",
+      "Bash(timeout 25 npx vite dev --port 5199)",
+      "Bash(curl -s http://localhost:5199/executive-overview -o /tmp/eo.html -w \"HTTP %{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:5199/compare)",
+      "Bash(pkill -f \"vite dev --port 5199\")"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {

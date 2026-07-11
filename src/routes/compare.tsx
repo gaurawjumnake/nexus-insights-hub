@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
   TrendingUp,
@@ -20,7 +20,7 @@ import {
 } from "recharts";
 import { usePortfolioKpis } from "@/hooks/usePortfolioKpis";
 import { kpi as kpiOf, kpiValue } from "@/lib/normaliseKpi";
-import { getKpiTrend } from "@/services/kpiService";
+import { getKpiTrendPortfolios } from "@/services/kpiService";
 import { buildTrailingWindow, type Grain } from "@/lib/periods";
 
 export const Route = createFileRoute("/compare")({
@@ -124,28 +124,28 @@ function ChartSection({
   const [grain, setGrain] = useState<Grain>("M");
   const window = buildTrailingWindow(grain);
 
-  const trendQueries = useQueries({
-    queries: companies.map((c) => ({
-      queryKey: ["kpi-trend", c.id, window.periodType, window.startPeriod, window.endPeriod, TREND_KPI],
-      queryFn: () => getKpiTrend(c.id, [TREND_KPI], window.periodType, window.startPeriod, window.endPeriod),
-      staleTime: 2 * 60 * 1000,
-      enabled: companies.length > 0,
-      throwOnError: false as const,
-    })),
+  const companyIds = useMemo(() => companies.map((c) => c.id), [companies]);
+
+  const trendQuery = useQuery({
+    queryKey: ["kpi-trend-portfolios", companyIds, window.periodType, window.startPeriod, window.endPeriod, TREND_KPI],
+    queryFn: () => getKpiTrendPortfolios(companyIds, [TREND_KPI], window.periodType, window.startPeriod, window.endPeriod),
+    staleTime: 2 * 60 * 1000,
+    enabled: companyIds.length > 0,
+    throwOnError: false,
   });
 
   const lineData = useMemo(() => {
     return window.periods.map(({ period, label }) => {
       const row: Record<string, string | number | null> = { p: label };
-      companies.forEach((c, idx) => {
-        const results = trendQueries[idx]?.data?.results?.[TREND_KPI] ?? [];
+      companies.forEach((c) => {
+        const results = trendQuery.data?.results?.[c.id]?.[TREND_KPI] ?? [];
         const match = results.find((r) => r.period === period);
         const v = match ? (typeof match.value === "number" && Number.isFinite(match.value) ? match.value : null) : null;
         row[c.id] = v;
       });
       return row;
     });
-  }, [window.periods, companies, trendQueries]);
+  }, [window.periods, companies, trendQuery.data]);
 
   const pieData = useMemo(() =>
     companies
@@ -154,8 +154,8 @@ function ChartSection({
     [companies, perCompany]
   );
 
-  const isFetching = trendQueries.some((q) => q.isFetching);
-  const isLoading  = trendQueries.some((q) => q.isLoading);
+  const isFetching = trendQuery.isFetching;
+  const isLoading  = trendQuery.isLoading;
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl overflow-hidden mb-5">

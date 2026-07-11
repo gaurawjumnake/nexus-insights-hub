@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkforceRouteImport } from './routes/workforce'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as RegistryRouteImport } from './routes/registry'
+import { Route as ExecutiveOverviewRouteImport } from './routes/executive-overview'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkforceIndexRouteImport } from './routes/workforce.index'
@@ -41,6 +42,11 @@ const UploadRoute = UploadRouteImport.update({
 const RegistryRoute = RegistryRouteImport.update({
   id: '/registry',
   path: '/registry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExecutiveOverviewRoute = ExecutiveOverviewRouteImport.update({
+  id: '/executive-overview',
+  path: '/executive-overview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -123,6 +129,7 @@ const RegistryAddFactRoute = RegistryAddFactRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/compare': typeof CompareRoute
+  '/executive-overview': typeof ExecutiveOverviewRoute
   '/registry': typeof RegistryRouteWithChildren
   '/upload': typeof UploadRoute
   '/workforce': typeof WorkforceRouteWithChildren
@@ -143,6 +150,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/compare': typeof CompareRoute
+  '/executive-overview': typeof ExecutiveOverviewRoute
   '/registry': typeof RegistryRouteWithChildren
   '/upload': typeof UploadRoute
   '/registry/add-fact': typeof RegistryAddFactRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/compare': typeof CompareRoute
+  '/executive-overview': typeof ExecutiveOverviewRoute
   '/registry': typeof RegistryRouteWithChildren
   '/upload': typeof UploadRoute
   '/workforce': typeof WorkforceRouteWithChildren
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/compare'
+    | '/executive-overview'
     | '/registry'
     | '/upload'
     | '/workforce'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/compare'
+    | '/executive-overview'
     | '/registry'
     | '/upload'
     | '/registry/add-fact'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/compare'
+    | '/executive-overview'
     | '/registry'
     | '/upload'
     | '/workforce'
@@ -245,6 +257,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CompareRoute: typeof CompareRoute
+  ExecutiveOverviewRoute: typeof ExecutiveOverviewRoute
   RegistryRoute: typeof RegistryRouteWithChildren
   UploadRoute: typeof UploadRoute
   WorkforceRoute: typeof WorkforceRouteWithChildren
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       path: '/registry'
       fullPath: '/registry'
       preLoaderRoute: typeof RegistryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/executive-overview': {
+      id: '/executive-overview'
+      path: '/executive-overview'
+      fullPath: '/executive-overview'
+      preLoaderRoute: typeof ExecutiveOverviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -430,6 +450,7 @@ const WorkforceRouteWithChildren = WorkforceRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CompareRoute: CompareRoute,
+  ExecutiveOverviewRoute: ExecutiveOverviewRoute,
   RegistryRoute: RegistryRouteWithChildren,
   UploadRoute: UploadRoute,
   WorkforceRoute: WorkforceRouteWithChildren,

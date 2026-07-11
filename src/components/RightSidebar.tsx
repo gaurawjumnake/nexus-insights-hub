@@ -14,6 +14,8 @@ import {
   ChevronDown,
   Layers,
   Archive,
+  Settings,
+  Trophy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ApiHealthIndicator } from "@/components/ApiHealthIndicator";
@@ -36,6 +38,7 @@ const PERSONA_NAV: NavItem[] = [
 ];
 
 const COMPARATIVE_NAV: NavItem[] = [
+  { to: "/executive-overview", label: "Executive Overview", icon: Trophy },
   { to: "/compare", label: "Snapshot", icon: GitCompare },
   { to: "/workforce/portfolio", label: "Portfolio", icon: LayoutDashboard },
 ];
@@ -50,7 +53,7 @@ const BOTTOM_NAV: NavItem[] = [
 ];
 
 export function RightSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const personaActive = useMemo(
@@ -68,6 +71,7 @@ export function RightSidebar() {
   const [personasOpen, setPersonasOpen] = useState(true);
   const [comparativeOpen, setComparativeOpen] = useState(true);
   const [registryOpen, setRegistryOpen] = useState(true);
+  const [configOpen, setConfigOpen] = useState(true);
 
   const renderItem = (item: NavItem, opts?: { nested?: boolean }) => {
     const Icon = item.icon;
@@ -157,12 +161,12 @@ export function RightSidebar() {
               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
           )}
           aria-expanded={comparativeOpen}
-          title="Comparative Analysis"
+          title="Analysis"
         >
           <GitCompare className="w-4 h-4 shrink-0" />
           {!collapsed && (
             <>
-              <span className="truncate flex-1 text-left">Comparative Analysis</span>
+              <span className="truncate flex-1 text-left">Analysis</span>
               {comparativeOpen ? (
                 <ChevronDown className="w-3.5 h-3.5" />
               ) : (
@@ -174,24 +178,28 @@ export function RightSidebar() {
         {(comparativeOpen || collapsed) &&
           COMPARATIVE_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
 
-        {/* Registry collapsible group */}
+        {BOTTOM_NAV.map((item) => renderItem(item))}
+      </nav>
+
+      <div className="border-t border-slate-200 py-2">
+        {/* Config collapsible group */}
         <button
           type="button"
-          onClick={() => setRegistryOpen((o) => !o)}
+          onClick={() => setConfigOpen((o) => !o)}
           className={cn(
             "w-[calc(100%-1rem)] mx-2 my-0.5 flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] transition-colors",
             registryActive
               ? "text-teal-700 font-semibold"
               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
           )}
-          aria-expanded={registryOpen}
-          title="Registry"
+          aria-expanded={configOpen}
+          title="Config"
         >
-          <Archive className="w-4 h-4 shrink-0" />
+          <Settings className="w-4 h-4 shrink-0" />
           {!collapsed && (
             <>
-              <span className="truncate flex-1 text-left">Registry</span>
-              {registryOpen ? (
+              <span className="truncate flex-1 text-left">Config</span>
+              {configOpen ? (
                 <ChevronDown className="w-3.5 h-3.5" />
               ) : (
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -199,11 +207,39 @@ export function RightSidebar() {
             </>
           )}
         </button>
-        {(registryOpen || collapsed) &&
-          REGISTRY_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
-
-        {BOTTOM_NAV.map((item) => renderItem(item))}
-      </nav>
+        {(configOpen || collapsed) && (
+          <>
+            {/* Registry collapsible group */}
+            <button
+              type="button"
+              onClick={() => setRegistryOpen((o) => !o)}
+              className={cn(
+                "w-[calc(100%-1rem)] mx-2 my-0.5 flex items-center gap-3 py-2.5 rounded-md text-[13px] transition-colors",
+                collapsed ? "px-3" : "pl-6 pr-3",
+                registryActive
+                  ? "text-teal-700 font-semibold"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+              )}
+              aria-expanded={registryOpen}
+              title="Registry"
+            >
+              <Archive className="w-4 h-4 shrink-0" />
+              {!collapsed && (
+                <>
+                  <span className="truncate flex-1 text-left">Registry</span>
+                  {registryOpen ? (
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  ) : (
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  )}
+                </>
+              )}
+            </button>
+            {(registryOpen || collapsed) &&
+              REGISTRY_NAV.map((item) => renderItem(item, { nested: !collapsed }))}
+          </>
+        )}
+      </div>
 
       <ApiHealthIndicator collapsed={collapsed} />
       {!collapsed && (
