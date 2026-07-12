@@ -284,8 +284,8 @@ function Section2Revenue() {
   // Backend values are raw USD; this chart's axis is labeled ($M).
   const trendDataInMillions = trendData.map((row) => ({
     ...row,
-    direct: row.direct == null ? null : row.direct / 1_000_000,
-    assisted: row.assisted == null ? null : row.assisted / 1_000_000,
+    direct: typeof row.direct === "number" ? row.direct / 1_000_000 : null,
+    assisted: typeof row.assisted === "number" ? row.assisted / 1_000_000 : null,
   }));
   return (
     <section>
