@@ -53,7 +53,7 @@ const BOTTOM_NAV: NavItem[] = [
 ];
 
 export function RightSidebar() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const personaActive = useMemo(
@@ -68,10 +68,10 @@ export function RightSidebar() {
     () => REGISTRY_NAV.some((i) => pathname === i.to || pathname.startsWith(i.to + "/")),
     [pathname],
   );
-  const [personasOpen, setPersonasOpen] = useState(true);
-  const [comparativeOpen, setComparativeOpen] = useState(true);
-  const [registryOpen, setRegistryOpen] = useState(true);
-  const [configOpen, setConfigOpen] = useState(true);
+  const [personasOpen, setPersonasOpen] = useState(false);
+  const [comparativeOpen, setComparativeOpen] = useState(false);
+  const [registryOpen, setRegistryOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
 
   const renderItem = (item: NavItem, opts?: { nested?: boolean }) => {
     const Icon = item.icon;

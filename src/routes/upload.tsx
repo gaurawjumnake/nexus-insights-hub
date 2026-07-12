@@ -1,4 +1,4 @@
-import { createFileRoute, useBlocker } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import {
   Upload as UploadIcon,
@@ -9,7 +9,7 @@ import {
   Trash2,
   Clock,
 } from "lucide-react";
-import { buildApiUrl } from "@/config/api";
+import { useUploadQueue, stageFiles, clearDocs, runUpload, isUploading } from "@/lib/uploadQueue";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -21,19 +21,10 @@ export const Route = createFileRoute("/upload")({
   component: UploadPage,
 });
 
-type UploadedDoc = {
-  id: string;
-  name: string;
-  size: number;
-  file: File;
-  status: "pending" | "uploading" | "success" | "error";
-  message?: string;
-};
-
 function UploadPage() {
   const [companyId, setCompanyId] = useState("");
   const [period, setPeriod] = useState("");
-  const [docs, setDocs] = useState<UploadedDoc[]>([]);
+  const docs = useUploadQueue();
   const [dragging, setDragging] = useState(false);
   const [errors, setErrors] = useState<{ companyId?: string; period?: string }>({});
   const inputRef = useRef<HTMLInputElement>(null);
@@ -46,52 +37,15 @@ function UploadPage() {
     return Object.keys(next).length === 0;
   }
 
-  function stageFiles(files: FileList | null) {
-    if (!files) return;
-    const incoming: UploadedDoc[] = Array.from(files).map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name,
-      size: file.size,
-      file,
-      status: "pending",
-    }));
-    setDocs((d) => [...d, ...incoming]);
-  }
-
-  async function uploadDoc(doc: UploadedDoc) {
-    setDocs((d) => d.map((x) => (x.id === doc.id ? { ...x, status: "uploading" } : x)));
-    const fd = new FormData();
-    fd.append("file", doc.file);
-    fd.append("company_id", companyId);
-    fd.append("period", period);
-    try {
-      const res = await fetch(buildApiUrl("/documents/upload"), { method: "POST", body: fd });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body?.detail || `Upload failed [${res.status}]`);
-      setDocs((d) =>
-        d.map((x) => (x.id === doc.id ? { ...x, status: "success", message: "Parsed & ingested" } : x))
-      );
-    } catch (err) {
-      setDocs((d) =>
-        d.map((x) => (x.id === doc.id ? { ...x, status: "error", message: (err as Error).message } : x))
-      );
-    }
-  }
-
   async function handleUpload() {
     if (!validateContext()) return;
-    const pending = docs.filter((d) => d.status === "pending");
-    if (!pending.length) return;
-    await Promise.all(pending.map(uploadDoc));
+    // Not awaited on purpose — runUpload keeps going (and toasts the result)
+    // even if the user navigates away from this page before it settles.
+    runUpload(companyId, period);
   }
 
   const pendingCount = docs.filter((d) => d.status === "pending").length;
-  const uploading = docs.some((d) => d.status === "uploading");
-
-  const { proceed, reset, status } = useBlocker({
-    shouldBlockFn: () => uploading,
-    withResolver: true,
-  });
+  const uploading = isUploading(docs);
 
   return (
     <div className="min-h-screen bg-slate-50" style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
@@ -195,7 +149,7 @@ function UploadPage() {
                 DOCUMENTS ({docs.length})
               </div>
               <button
-                onClick={() => setDocs([])}
+                onClick={clearDocs}
                 className="text-[11px] text-slate-500 hover:text-rose-600 flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" /> Clear
@@ -224,7 +178,12 @@ function UploadPage() {
 
         {/* Upload button */}
         {pendingCount > 0 && (
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex items-center justify-end gap-3">
+            {uploading && (
+              <span className="text-[11px] text-slate-400">
+                Safe to switch screens — you'll get a toast when it's done.
+              </span>
+            )}
             <button
               type="button"
               onClick={handleUpload}
@@ -237,34 +196,6 @@ function UploadPage() {
           </div>
         )}
       </div>
-
-      {/* Navigation-block dialog */}
-      {status === "blocked" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <div className="text-sm font-semibold text-slate-900 mb-2">
-              Upload in progress
-            </div>
-            <p className="text-sm text-slate-500 mb-5">
-              Switching screens while uploading documents may stop the process. Do you want to continue?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={reset}
-                className="px-4 py-2 rounded-md text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200"
-              >
-                Stay
-              </button>
-              <button
-                onClick={proceed}
-                className="px-4 py-2 rounded-md text-sm font-medium text-white bg-rose-500 hover:bg-rose-600"
-              >
-                Leave anyway
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

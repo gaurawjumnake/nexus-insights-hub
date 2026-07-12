@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { RightSidebar } from "../components/RightSidebar";
 import { AIAssistant } from "../components/AIAssistant";
 import { useAiCollapsed } from "../lib/ai-assistant-state";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +134,7 @@ function RootComponent() {
       </div>
       <RightSidebar />
       <AIAssistant />
+      <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
   );
 }
