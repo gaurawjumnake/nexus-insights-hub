@@ -21,6 +21,13 @@ function generateSessionId() {
   return `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLLS = 150; // ~5 minutes
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function AIAssistant() {
   const [collapsed, setCollapsedState] = useState(false);
   const setCollapsed = (v: boolean) => {
@@ -120,35 +127,60 @@ export function AIAssistant() {
     setInput("");
     setSending(true);
 
+    let jobId: string;
     try {
-      const res = await fetch(buildApiUrl("/chat/ask"), {
+      const res = await fetch(buildApiUrl("/chat/ask/async"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg.content, contexts, session_id: sessionId.current }),
       });
       if (!res.ok) throw new Error(String(res.status));
-      const data = await res.json().catch(() => ({}) as any);
-      const reply =
-        data?.reply ??
-        data?.response ??
-        data?.message ??
-        (typeof data === "string" ? data : "");
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          content: reply || "(no response)",
-        },
-      ]);
+      const data = await res.json();
+      jobId = data.job_id;
     } catch {
       setMessages((m) => [
         ...m,
-        {
-          role: "assistant",
-          content:
-            "I'm offline right now, but here's a sample insight: this KPI is trending within expected portfolio benchmarks.",
-        },
+        { role: "assistant", content: "Couldn't reach the server. Please try again." },
       ]);
+      setSending(false);
+      return;
+    }
+
+    try {
+      let result: any = null;
+      let failed = false;
+      let errorMessage = "";
+
+      for (let i = 0; i < MAX_POLLS; i++) {
+        await sleep(POLL_INTERVAL_MS);
+        const jobRes = await fetch(buildApiUrl(`/jobs/${jobId}`));
+        if (!jobRes.ok) continue;
+        const job = await jobRes.json();
+
+        if (job.status === "done") {
+          result = job.result;
+          break;
+        }
+        if (job.status === "failed") {
+          failed = true;
+          errorMessage = job.error || "Something went wrong while processing your request.";
+          break;
+        }
+      }
+
+      if (result) {
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", content: result.response || "(no response)" },
+        ]);
+      } else if (failed) {
+        setMessages((m) => [...m, { role: "assistant", content: errorMessage }]);
+      } else {
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", content: "This is taking longer than expected. Please try again." },
+        ]);
+      }
     } finally {
       setSending(false);
     }

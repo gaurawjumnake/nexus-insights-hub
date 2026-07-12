@@ -36,7 +36,7 @@ import { buildTrailingWindow, type Grain } from '@/lib/periods'
 
 const STALE_TIME = 2 * 60 * 1000
 
-export type TrendRow = { p: string } & Record<string, number | null>
+export type TrendRow = { p: string; [key: string]: string | number | null }
 
 export interface UseKpiTrendResult {
   /** Recharts-ready rows: [{ p: "Jan", direct: 0.5, assisted: 0.4 }, ...] */
