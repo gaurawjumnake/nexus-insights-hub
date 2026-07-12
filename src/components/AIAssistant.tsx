@@ -21,6 +21,13 @@ function generateSessionId() {
   return `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLLS = 150; // ~5 minutes
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function AIAssistant() {
   const [collapsed, setCollapsedState] = useState(false);
   const setCollapsed = (v: boolean) => {
