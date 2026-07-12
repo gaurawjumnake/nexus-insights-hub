@@ -21,11 +21,16 @@ function generateSessionId() {
   return `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-const POLL_INTERVAL_MS = 2000;
-const MAX_POLLS = 150; // ~5 minutes
+const POLL_TIMEOUT_MS = 5 * 60 * 1000; // ~5 minutes
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function nextPollDelay(elapsedMs: number) {
+  if (elapsedMs < 10_000) return 1500;
+  if (elapsedMs < 30_000) return 3000;
+  return 5000;
 }
 
 export function AIAssistant() {
@@ -154,8 +159,9 @@ export function AIAssistant() {
       let failed = false;
       let errorMessage = "";
 
-      for (let i = 0; i < MAX_POLLS; i++) {
-        await sleep(POLL_INTERVAL_MS);
+      const start = Date.now();
+      while (Date.now() - start < POLL_TIMEOUT_MS) {
+        await sleep(nextPollDelay(Date.now() - start));
         const jobRes = await fetch(buildApiUrl(`/jobs/${jobId}`));
         if (!jobRes.ok) continue;
         const job = await jobRes.json();
